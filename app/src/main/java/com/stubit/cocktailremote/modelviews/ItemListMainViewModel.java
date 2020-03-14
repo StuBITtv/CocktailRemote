@@ -1,12 +1,12 @@
-package com.example.cocktailremote.modelviews;
+package com.stubit.cocktailremote.modelviews;
 
 import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.*;
-import com.example.cocktailremote.models.CocktailModel;
-import com.example.cocktailremote.repositories.CocktailRepository;
+import com.stubit.cocktailremote.models.CocktailModel;
+import com.stubit.cocktailremote.repositories.CocktailRepository;
 
 import java.io.File;
 import java.lang.reflect.Constructor;

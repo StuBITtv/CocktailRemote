@@ -1,12 +1,12 @@
-package com.example.cocktailremote;
+package com.stubit.cocktailremote;
 
 import android.os.Bundle;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.cocktailremote.adapters.CocktailAdapter;
-import com.example.cocktailremote.models.CocktailModel;
-import com.example.cocktailremote.modelviews.ItemListMainViewModel;
+import com.stubit.cocktailremote.adapters.CocktailAdapter;
+import com.stubit.cocktailremote.models.CocktailModel;
+import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;

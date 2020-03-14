@@ -1,4 +1,4 @@
-package com.example.cocktailremote;
+package com.stubit.cocktailremote;
 
 import org.junit.Test;
 

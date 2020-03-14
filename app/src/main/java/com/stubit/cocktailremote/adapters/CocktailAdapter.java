@@ -1,4 +1,4 @@
-package com.example.cocktailremote.adapters;
+package com.stubit.cocktailremote.adapters;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,8 +9,8 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
-import com.example.cocktailremote.R;
-import com.example.cocktailremote.modelviews.ItemListMainViewModel;
+import com.stubit.cocktailremote.R;
+import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import java.io.File;
