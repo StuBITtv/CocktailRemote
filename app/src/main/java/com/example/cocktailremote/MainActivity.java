@@ -2,12 +2,12 @@ package com.example.cocktailremote;
 
 import android.os.Bundle;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.cocktailremote.adapters.CocktailAdapter;
+import com.example.cocktailremote.models.CocktailModel;
 import com.example.cocktailremote.modelviews.ItemListMainViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
@@ -23,19 +23,24 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        final ItemListMainViewModel viewModel = new ViewModelProvider(
+                this,
+                new ItemListMainViewModel.Factory(getApplicationContext(), this)
+        ).get(ItemListMainViewModel.class);
+
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                viewModel.addCocktail(new CocktailModel("New Cocktail"));
             }
         });
 
         RecyclerView cocktailList = findViewById(R.id.cocktailList);
         cocktailList.setAdapter(
-                new CocktailAdapter(new ViewModelProvider(this).get(ItemListMainViewModel.class))
+                new CocktailAdapter(this, viewModel)
         );
+        cocktailList.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
