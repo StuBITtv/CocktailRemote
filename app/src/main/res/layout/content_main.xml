@@ -17,6 +17,5 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
             tools:listitem="@layout/item_main"
-            android:background="@color/colorPrimaryDark"
-            android:id="@+id/cocktailList"/>
+            android:id="@+id/cocktailList" android:background="@color/colorPrimaryLight"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,16 +1,18 @@
 package com.stubit.cocktailremote.adapters;
 
+import android.content.Intent;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
+import com.stubit.cocktailremote.CocktailActivity;
 import com.stubit.cocktailremote.R;
 import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
+import com.stubit.cocktailremote.views.TextView;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import java.io.File;
@@ -20,13 +22,18 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     final private ItemListMainViewModel mViewModel;
     private final static String TAG = "CocktailAdapter";
 
+    private ArrayList<String> mCocktailNames;
+    private ArrayList<File> mCocktailImages;
+
     public CocktailAdapter(LifecycleOwner owner, final ItemListMainViewModel viewModel) {
         mViewModel = viewModel;
 
         mViewModel.getCocktailNames().observe(owner, new Observer<ArrayList<String>>() {
             @Override
-            public void onChanged(ArrayList<String> strings) {
+            public void onChanged(ArrayList<String> cocktailNames) {
                 Log.d(TAG, "dataset changed");
+
+                mCocktailNames = cocktailNames;
                 notifyDataSetChanged();
             }
         });
@@ -35,6 +42,8 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
             @Override
             public void onChanged(ArrayList<File> files) {
                 Log.d(TAG, "dataset changed");
+
+                mCocktailImages = files;
                 notifyDataSetChanged();
             }
         });
@@ -48,9 +57,10 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if(mViewModel.getCocktailNames().getValue() != null) {
-            holder.mNameView.setText(mViewModel.getCocktailNames().getValue().get(position));
+    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
+        if (mCocktailNames != null) {
+            String cocktailName = mViewModel.getCocktailNames().getValue().get(position);
+            holder.mNameView.setText(cocktailName, R.string.unnamed_cocktail);
         }
 
         /*  Glide.with(holder.mImageView)
@@ -58,6 +68,23 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
                 .into(holder.mImageView);
          */
 
+        holder.mHolder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent cocktailDetailsIntent = new Intent(
+                        v.getContext(), CocktailActivity.class
+                );
+
+                if (mViewModel.getCocktailIds().getValue() != null) {
+                    cocktailDetailsIntent.putExtra(
+                            CocktailActivity.ID_EXTRA_KEY,
+                            mViewModel.getCocktailIds().getValue().get(position)
+                    );
+                }
+
+                v.getContext().startActivity(cocktailDetailsIntent);
+            }
+        });
     }
 
     @Override
@@ -71,11 +98,14 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        View mHolder;
         TextView mNameView;
         CircleImageView mImageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+
+            mHolder = itemView;
             mNameView = itemView.findViewById(R.id.cocktailName);
             mImageView = itemView.findViewById(R.id.cocktailImage);
         }

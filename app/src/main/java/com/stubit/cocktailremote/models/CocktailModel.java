@@ -8,7 +8,7 @@ import java.util.List;
 @Entity
 public class CocktailModel {
     @PrimaryKey(autoGenerate = true)
-    protected int mId;
+    protected Integer mId;
 
     @ColumnInfo(name = "name")
     protected String mName;
@@ -16,20 +16,20 @@ public class CocktailModel {
     @ColumnInfo(name = "image_path")
     protected String mImagePath;
 
+    @ColumnInfo(name = "description")
+    protected String mDescription;
+
     public CocktailModel() {}
 
     @Ignore
-    public CocktailModel(String name) {
-        mName = name;
+    public CocktailModel(CocktailModel other) {
+        mId = other.mId;
+        mName = other.mName;
+        mImagePath = other.mImagePath;
+        mDescription = other.mDescription;
     }
 
-    @Ignore
-    public CocktailModel(String name, String imagePath) {
-        mName = name;
-        mImagePath = imagePath;
-    }
-
-    public int getId() {
+    public Integer getId() {
         return mId;
     }
 
@@ -49,6 +49,14 @@ public class CocktailModel {
         this.mImagePath = mImagePath;
     }
 
+    public String getDescription() {
+        return mDescription;
+    }
+
+    public void setDescription(String mDescription) {
+        this.mDescription = mDescription;
+    }
+
     @Dao
     public interface Access {
         @Query("SELECT * FROM CocktailModel")
@@ -58,7 +66,7 @@ public class CocktailModel {
         LiveData<CocktailModel> byId(int id);
 
         @Insert
-        void addModel(CocktailModel model);
+        Long addModel(CocktailModel model);
 
         @Delete
         void deleteModel(CocktailModel model);

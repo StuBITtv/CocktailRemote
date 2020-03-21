@@ -15,13 +15,11 @@ import java.util.List;
 public class CocktailRepository {
     public static final String TAG = "CocktailRepository";
 
-    private CocktailRepository() {}
-
     public static CocktailRepository getRepository(Context c) {
         if (mInstance == null) {
             mInstance = new CocktailRepository();
 
-            mCocktailAccess =  Database.getDatabase(c).CocktailAccess();
+            mCocktailAccess = Database.getDatabase(c).CocktailAccess();
         }
 
         return mInstance;
@@ -36,13 +34,13 @@ public class CocktailRepository {
                 public void onChanged(List<CocktailModel> cocktails) {
                     SparseArray<CocktailModel> newCocktails = new SparseArray<>();
 
-                    if(cocktails != null) {
+                    if (cocktails != null) {
                         for (CocktailModel cocktail : cocktails) {
                             newCocktails.append(cocktail.getId(), cocktail);
                         }
                     }
 
-                    mCocktails.setValue(newCocktails);
+                    mCocktails.postValue(newCocktails);
                     Log.d(TAG, "CocktailList updated");
                 }
             });
@@ -55,14 +53,39 @@ public class CocktailRepository {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                mCocktailAccess.addModel(cocktailModel);
+                mLatestId.postValue(mCocktailAccess.addModel(cocktailModel).intValue());
                 Log.d(TAG, "CocktailModel added to database");
             }
         }).start();
+    }
+
+    public void updateCocktail(final CocktailModel cocktailModel) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mCocktailAccess.updateModel(cocktailModel);
+                Log.d(TAG, "CocktailModel updated");
+            }
+        }).start();
+    }
+
+    public void deleteCocktail(final CocktailModel cocktailModel) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                mCocktailAccess.deleteModel(cocktailModel);
+                Log.d(TAG, "CocktailModel deleted");
+            }
+        }).start();
+    }
+
+    public LiveData<Integer> latestId() {
+        return mLatestId;
     }
 
     private static CocktailRepository mInstance;
 
     private static CocktailModel.Access mCocktailAccess;
     private MutableLiveData<SparseArray<CocktailModel>> mCocktails;
+    private MutableLiveData<Integer> mLatestId = new MutableLiveData<>(null);
 }

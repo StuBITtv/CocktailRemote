@@ -1,4 +1,14 @@
 <resources>
     <string name="app_name">Cocktail Remote</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_cocktail">Cocktail Details</string>
+    <string name="cocktail_image">Picture of the Cocktail</string>
+    <string name="ingredients">Ingredients</string>
+    <string name="no_ingredients">No ingredients added yet.</string>
+    <string name="no_description">No description added yet.</string>
+    <string name="unnamed_cocktail">Unnamed Cocktail</string>
+    <string name="cocktail_name">Cocktail Name</string>
+    <string name="cocktail_description">Cocktail Description</string>
+    <string name="edit">Edit</string>
+    <string name="title_activity_edit">Edit Cocktail</string>
 </resources>
