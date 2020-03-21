@@ -10,5 +10,6 @@
     <string name="cocktail_name">Cocktail Name</string>
     <string name="cocktail_description">Cocktail Description</string>
     <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
     <string name="title_activity_edit">Edit Cocktail</string>
 </resources>

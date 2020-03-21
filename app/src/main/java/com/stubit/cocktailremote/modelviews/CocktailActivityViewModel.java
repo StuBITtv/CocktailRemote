@@ -38,7 +38,7 @@ public class CocktailActivityViewModel extends ViewModel {
     }
 
     public Integer getCocktailId() {
-        return mCocktail.getId();
+        return mCocktail != null ? mCocktail.getId() : null;
     }
 
     public LiveData<String> getCocktailName() {

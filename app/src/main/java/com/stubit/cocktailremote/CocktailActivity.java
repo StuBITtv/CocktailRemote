@@ -76,11 +76,7 @@ public class CocktailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-
-        if(item.getTitle() == getString(R.string.edit)) {
+        if(item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
             Intent editIntent = new Intent(this, EditActivity.class);
             editIntent.putExtra(ID_EXTRA_KEY, viewModel.getCocktailId());
 

@@ -107,10 +107,12 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        viewModel.deleteCocktail();
+        if(item.getTitle() != null && item.getTitle().equals(getString(R.string.delete))) {
+            viewModel.deleteCocktail();
 
-        startActivity(new Intent(this, MainActivity.class));
-        finish();
+            startActivity(new Intent(this, MainActivity.class));
+            finish();
+        }
 
         return super.onOptionsItemSelected(item);
     }
