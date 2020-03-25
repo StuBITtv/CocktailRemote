@@ -88,7 +88,7 @@ public class CocktailRepository {
         }).start();
     }
 
-    public Uri addCocktailImage(Context c, CocktailModel cocktailModel, Uri imageUri) throws IOException {
+    public Uri addCocktailImage(@NotNull Context c, Uri imageUri) throws IOException {
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
 
@@ -111,18 +111,18 @@ public class CocktailRepository {
 
             return Uri.parse(fileTargetPath);
         } finally {
-            if(inputStream != null) {
+            if (inputStream != null) {
                 inputStream.close();
             }
 
-            if(outputStream != null) {
+            if (outputStream != null) {
                 outputStream.close();
             }
         }
     }
 
     public void deleteCocktailImage(Uri cocktailImageUri) {
-        if(cocktailImageUri != null) {
+        if (cocktailImageUri != null) {
             File oldImage = new File(cocktailImageUri.getPath());
 
             //noinspection ResultOfMethodCallIgnored

@@ -31,7 +31,7 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
     public void setCocktailImageUri(Context c, Uri cocktailImageUri) throws IOException {
         deleteTempImage();
 
-        mCocktailImageUri.setValue(mCocktailRepository.addCocktailImage(c, mCocktail, cocktailImageUri));
+        mCocktailImageUri.setValue(mCocktailRepository.addCocktailImage(c, cocktailImageUri));
         mUnsavedChanges.setValue(true);
     }
 
@@ -74,7 +74,7 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
         if (imageUri != null && !imageUri.toString().equals(mCocktail.getImageUri())) {
             deleteCocktailImage();
             mCocktail.setImageUri(imageUri.toString());
-        } else {
+        } else if (imageUri == null) {
             mCocktail.setImageUri(null);
         }
 
