@@ -1,95 +1,124 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<androidx.core.widget.NestedScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
         xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:showIn="@layout/activity_edit"
-        tools:context=".EditActivity"
-        android:background="@color/colorPrimary">
-    <com.stubit.cocktailremote.views.CocktailImageView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            tools:srcCompat="@tools:sample/backgrounds/scenic[19]"
-            android:id="@+id/cocktail_image"
-            android:scaleType="center"
-            android:maxHeight="150sp"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/cocktail_image"
-    />
-    <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/cocktail_name"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cocktail_image"
-            android:textColor="@android:color/white"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp" android:textStyle="bold" android:text="@string/cocktail_name"/>
-    <EditText
-            app:backgroundTint="@color/colorAccent"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/cocktailNameInput"
-            app:layout_constraintEnd_toEndOf="@+id/cocktail_name"
-            app:layout_constraintStart_toStartOf="@+id/cocktail_name" app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintTop_toBottomOf="@+id/cocktail_name"
-            android:textColor="@android:color/white"
-            android:importantForAutofill="no"
-            tools:ignore="LabelFor"
-    />
-    <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/cocktail_description" app:layout_constraintStart_toStartOf="@+id/cocktail_name"
-            android:textColor="@android:color/white"
-            app:layout_constraintEnd_toEndOf="@+id/cocktail_name"
-            app:layout_constraintTop_toBottomOf="@+id/cocktailNameInput"
-            android:layout_marginTop="32dp" android:textSize="18sp" android:textStyle="bold"
-            android:text="@string/cocktail_description"/>
-    <EditText
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:inputType="textPersonName"
-            android:ems="10"
-            android:id="@+id/cocktailDescriptionInput"
-            app:layout_constraintTop_toBottomOf="@+id/cocktail_description"
-            app:layout_constraintStart_toStartOf="@+id/cocktail_description"
-            app:layout_constraintEnd_toEndOf="@+id/cocktail_description"
-            android:textColor="@android:color/white" android:importantForAutofill="no" tools:ignore="LabelFor"
-            app:backgroundTint="@color/colorAccent"
-    />
-    <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@+id/cocktail_description"
-            app:layout_constraintEnd_toEndOf="@+id/cocktail_description" android:text="@string/ingredients"
-            android:textColor="@android:color/white" android:textSize="18sp"
-            android:id="@+id/textView" android:textStyle="bold"
-            app:layout_constraintHorizontal_bias="0.0" app:layout_constraintTop_toBottomOf="@+id/cocktailDescriptionInput"
-            android:layout_marginTop="32dp"/>
-    <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/textView" app:layout_constraintStart_toStartOf="@+id/textView"
-            app:layout_constraintEnd_toEndOf="@+id/textView" android:layout_marginTop="8dp">
-        <com.stubit.cocktailremote.views.TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:id="@+id/noIncredients"
-                android:textColor="@android:color/white" android:text="@string/no_ingredients"
-                android:textStyle="italic"/>
-    </LinearLayout>
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+        android:layout_width="match_parent"
+        android:fillViewport="true"
+>
+    <androidx.constraintlayout.widget.ConstraintLayout
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/colorPrimary"
+            tools:showIn="@layout/activity_edit"
+            tools:context=".EditActivity"
+    >
+        <com.stubit.cocktailremote.views.CocktailImageView
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cocktail_image"
+                android:scaleType="center"
+                android:maxHeight="150sp"
+                android:adjustViewBounds="true"
+                android:contentDescription="@string/cocktail_image"
+                android:layout_marginTop="48dp"
+                tools:srcCompat="@tools:sample/backgrounds/scenic[19]"
+        />
+        <TextView
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cocktail_image"
+                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cocktail_name"
+                android:textColor="@android:color/white"
+                android:layout_marginLeft="16dp"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:textSize="18sp"
+                android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"
+                android:textStyle="bold"
+                android:text="@string/cocktail_name"
+        />
+        <EditText
+                app:backgroundTint="@color/colorAccent"
+                app:layout_constraintEnd_toEndOf="@+id/cocktail_name"
+                app:layout_constraintStart_toStartOf="@+id/cocktail_name"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintTop_toBottomOf="@+id/cocktail_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/cocktailNameInput"
+                android:textColor="@android:color/white"
+                android:importantForAutofill="no"
+                tools:ignore="LabelFor"
+        />
+        <TextView
+                app:layout_constraintStart_toStartOf="@+id/cocktail_name"
+                app:layout_constraintEnd_toEndOf="@+id/cocktail_name"
+                app:layout_constraintTop_toBottomOf="@+id/cocktailNameInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/cocktail_description"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="32dp"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:text="@string/cocktail_description"
+        />
+        <EditText
+                app:layout_constraintTop_toBottomOf="@+id/cocktail_description"
+                app:layout_constraintEnd_toEndOf="@+id/cocktail_description"
+                app:layout_constraintStart_toStartOf="@+id/cocktail_description"
+                app:backgroundTint="@color/colorAccent"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:ems="10"
+                android:id="@+id/cocktailDescriptionInput"
+                android:textColor="@android:color/white"
+                android:importantForAutofill="no"
+                tools:ignore="LabelFor"
+        />
+        <TextView
+                app:layout_constraintEnd_toEndOf="@+id/cocktail_description"
+                app:layout_constraintStart_toStartOf="@+id/cocktail_description"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintTop_toBottomOf="@+id/cocktailDescriptionInput"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="@string/ingredients"
+                android:textColor="@android:color/white"
+                android:textSize="18sp"
+                android:id="@+id/textView"
+                android:textStyle="bold"
+                android:layout_marginTop="32dp"
+        />
+        <LinearLayout
+                app:layout_constraintTop_toBottomOf="@+id/textView"
+                app:layout_constraintStart_toStartOf="@+id/textView"
+                app:layout_constraintEnd_toEndOf="@+id/textView"
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+        >
+            <com.stubit.cocktailremote.views.TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/noIngredients"
+                    android:textColor="@android:color/white"
+                    android:text="@string/no_ingredients"
+                    android:textStyle="italic"
+            />
+        </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.core.widget.NestedScrollView>
