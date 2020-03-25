@@ -83,6 +83,10 @@ public class CocktailRepository {
         return mLatestId;
     }
 
+    public void resetLatestId() {
+        mLatestId.setValue(null);
+    }
+
     private static CocktailRepository mInstance;
 
     private static CocktailModel.Access mCocktailAccess;

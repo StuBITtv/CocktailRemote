@@ -42,6 +42,8 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
                     if(newId != null) {
                         mCocktailId = newId;
                         mCocktailRepository.latestId().removeObserver(this);
+
+                        mCocktailRepository.resetLatestId();
                     }
                 }
             });
