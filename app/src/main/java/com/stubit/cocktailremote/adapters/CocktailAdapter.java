@@ -114,8 +114,8 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
             super(itemView);
 
             mHolder = itemView;
-            mNameView = itemView.findViewById(R.id.cocktailName);
-            mImageView = itemView.findViewById(R.id.cocktailImage);
+            mNameView = itemView.findViewById(R.id.cocktail_name);
+            mImageView = itemView.findViewById(R.id.cocktail_image);
         }
     }
 }

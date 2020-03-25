@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        RecyclerView cocktailList = findViewById(R.id.cocktailList);
+        RecyclerView cocktailList = findViewById(R.id.cocktail_list);
         cocktailList.setAdapter(
                 new CocktailAdapter(this, viewModel)
         );

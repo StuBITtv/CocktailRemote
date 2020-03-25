@@ -16,7 +16,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/cocktailList"
+            android:id="@+id/cocktail_list"
             android:background="@color/colorPrimaryLight"
             tools:listitem="@layout/item_main"
     />

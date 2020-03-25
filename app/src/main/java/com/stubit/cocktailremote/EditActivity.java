@@ -87,7 +87,7 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-        setupTextInput(R.id.cocktailNameInput, new TextInputInterface() {
+        setupTextInput(R.id.cocktail_name_input, new TextInputInterface() {
             @Override
             public String getText() {
                 return mViewModel.getCocktailName().getValue();
@@ -99,7 +99,7 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-        setupTextInput(R.id.cocktailDescriptionInput, new TextInputInterface() {
+        setupTextInput(R.id.cocktail_description_input, new TextInputInterface() {
             @Override
             public String getText() {
                 return mViewModel.getCocktailDescription().getValue();
