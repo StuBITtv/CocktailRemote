@@ -1,6 +1,7 @@
 package com.stubit.cocktailremote.repositories;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 import androidx.lifecycle.LiveData;
@@ -8,7 +9,13 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.models.Database;
+import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 
@@ -69,7 +76,9 @@ public class CocktailRepository {
         }).start();
     }
 
-    public void deleteCocktail(final CocktailModel cocktailModel) {
+    public void deleteCocktail(@NotNull final CocktailModel cocktailModel) {
+        deleteCocktailImage(cocktailModel.getImageUri());
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -77,6 +86,64 @@ public class CocktailRepository {
                 Log.d(TAG, "CocktailModel deleted");
             }
         }).start();
+    }
+
+    public Uri setCocktailImage(@NotNull Context c, @NotNull CocktailModel cocktailModel, Uri imageUri) throws IOException {
+        InputStream inputStream = null;
+        FileOutputStream outputStream = null;
+
+        try {
+            deleteCocktailImage(cocktailModel.getImageUri());
+
+            String fileTargetPath = c.getFilesDir().getPath() + File.separatorChar + new Date().getTime();
+            Log.d(TAG, "Copying image to internal storage. The new path is " + fileTargetPath);
+
+            inputStream = c.getContentResolver().openInputStream(imageUri);
+            outputStream = new FileOutputStream(fileTargetPath, false);
+
+            byte[] buffer = new byte[4 * 1024]; // or other buffer size
+            int read;
+
+            //noinspection ConstantConditions
+            while ((read = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, read);
+            }
+
+            outputStream.flush();
+
+            cocktailModel.setImageUri(Uri.parse(fileTargetPath).toString());
+
+            if(cocktailModel.getId() == null) {
+                updateCocktail(cocktailModel);
+            }
+
+            return Uri.parse(fileTargetPath);
+        } finally {
+            if(inputStream != null) {
+                inputStream.close();
+            }
+
+            if(outputStream != null) {
+                outputStream.close();
+            }
+        }
+    }
+
+    public void removeCocktailImage(@NotNull CocktailModel cocktailModel) {
+        if(cocktailModel.getImageUri() != null) {
+            deleteCocktailImage(cocktailModel.getImageUri());
+            cocktailModel.setImageUri(null);
+            updateCocktail(cocktailModel);
+        }
+    }
+
+    private void deleteCocktailImage(String cocktailImage) {
+        if(cocktailImage != null) {
+            File oldImage = new File(Uri.parse(cocktailImage).getPath());
+
+            //noinspection ResultOfMethodCallIgnored
+            oldImage.delete();
+        }
     }
 
     public LiveData<Integer> latestId() {

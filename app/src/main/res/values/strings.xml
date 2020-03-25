@@ -13,4 +13,5 @@
     <string name="delete">Delete</string>
     <string name="title_activity_edit">Edit Cocktail</string>
     <string name="permission_needed">Permission needed to pick cocktail image.</string>
+    <string name="not_found">Image not found.</string>
 </resources>

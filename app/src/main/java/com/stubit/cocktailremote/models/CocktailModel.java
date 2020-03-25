@@ -13,21 +13,13 @@ public class CocktailModel {
     @ColumnInfo(name = "name")
     protected String mName;
 
-    @ColumnInfo(name = "image_path")
-    protected String mImagePath;
+    @ColumnInfo(name = "image_uri")
+    protected String mImageUri;
 
     @ColumnInfo(name = "description")
     protected String mDescription;
 
     public CocktailModel() {}
-
-    @Ignore
-    public CocktailModel(CocktailModel other) {
-        mId = other.mId;
-        mName = other.mName;
-        mImagePath = other.mImagePath;
-        mDescription = other.mDescription;
-    }
 
     public Integer getId() {
         return mId;
@@ -41,12 +33,12 @@ public class CocktailModel {
         this.mName = mName;
     }
 
-    public String getImagePath() {
-        return mImagePath;
+    public String getImageUri() {
+        return mImageUri;
     }
 
-    public void setImagePath(String mImagePath) {
-        this.mImagePath = mImagePath;
+    public void setImageUri(String mImageUri) {
+        this.mImageUri = mImageUri;
     }
 
     public String getDescription() {
@@ -61,9 +53,6 @@ public class CocktailModel {
     public interface Access {
         @Query("SELECT * FROM CocktailModel")
         LiveData<List<CocktailModel>> all();
-
-        @Query("SELECT * FROM CocktailModel WHERE mId == (:id)")
-        LiveData<CocktailModel> byId(int id);
 
         @Insert
         Long addModel(CocktailModel model);

@@ -1,6 +1,7 @@
 package com.stubit.cocktailremote;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,8 +15,6 @@ import com.stubit.cocktailremote.modelviews.CocktailActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 import com.stubit.cocktailremote.views.CocktailImageView;
 import com.stubit.cocktailremote.views.TextView;
-
-import java.io.File;
 
 public class CocktailActivity extends AppCompatActivity {
 
@@ -54,10 +53,10 @@ public class CocktailActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.getCocktailImage().observe(this, new Observer<File>() {
+        viewModel.getCocktailImageUri().observe(this, new Observer<Uri>() {
             @Override
-            public void onChanged(File file) {
-                ((CocktailImageView)findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), file);
+            public void onChanged(Uri uri) {
+                ((CocktailImageView)findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), uri);
             }
         });
 

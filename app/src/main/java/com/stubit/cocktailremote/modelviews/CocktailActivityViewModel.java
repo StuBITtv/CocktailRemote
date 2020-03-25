@@ -1,19 +1,18 @@
 package com.stubit.cocktailremote.modelviews;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.SparseArray;
 import androidx.lifecycle.*;
-import com.stubit.cocktailremote.CocktailActivity;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.repositories.CocktailRepository;
 
-import java.io.File;
 import java.util.List;
 
 public class CocktailActivityViewModel extends ViewModel {
     protected CocktailModel mCocktail;
     protected MutableLiveData<String> mCocktailName = new MutableLiveData<>();
-    protected MutableLiveData<File> mCocktailImage = new MutableLiveData<>();
+    protected MutableLiveData<Uri> mCocktailImageUri = new MutableLiveData<>();
     protected MutableLiveData<String> mCocktailDescription = new MutableLiveData<>();
     protected MutableLiveData<List<String>> mCocktailIngredients = new MutableLiveData<>();
 
@@ -45,8 +44,8 @@ public class CocktailActivityViewModel extends ViewModel {
         return mCocktailName;
     }
 
-    public LiveData<File> getCocktailImage() {
-        return mCocktailImage;
+    public LiveData<Uri> getCocktailImageUri() {
+        return mCocktailImageUri;
     }
 
     public LiveData<String> getCocktailDescription() {
@@ -70,7 +69,13 @@ public class CocktailActivityViewModel extends ViewModel {
             if(mCocktail != null) {
                 mCocktailName.setValue(mCocktail.getName());
                 mCocktailDescription.setValue(mCocktail.getDescription());
-                mCocktailImage.setValue(null);
+
+                if(mCocktail.getImageUri() != null) {
+                    mCocktailImageUri.setValue(Uri.parse(mCocktail.getImageUri()));
+                } else {
+                    mCocktailImageUri.setValue(null);
+                }
+
                 mCocktailIngredients.setValue(null);
             }
         }

@@ -1,13 +1,13 @@
 package com.stubit.cocktailremote.modelviews;
 
 import android.content.Context;
+import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 import androidx.lifecycle.*;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.repositories.CocktailRepository;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class ItemListMainViewModel extends ViewModel {
@@ -15,7 +15,7 @@ public class ItemListMainViewModel extends ViewModel {
 
     private MutableLiveData<ArrayList<Integer>> mCocktailIds = new MutableLiveData<>();
     private MutableLiveData<ArrayList<String>> mCocktailNames = new MutableLiveData<>();
-    private MutableLiveData<ArrayList<File>> mCocktailImages = new MutableLiveData<>();
+    private MutableLiveData<ArrayList<Uri>> mCocktailImages = new MutableLiveData<>();
 
     private CocktailRepository mCocktailRepository;
 
@@ -38,7 +38,7 @@ public class ItemListMainViewModel extends ViewModel {
         return mCocktailNames;
     }
 
-    public LiveData<ArrayList<File>> getCocktailImages() {
+    public LiveData<ArrayList<Uri>> getCocktailImageUris() {
         return mCocktailImages;
     }
 
@@ -47,7 +47,7 @@ public class ItemListMainViewModel extends ViewModel {
 
         ArrayList<Integer> cocktailIds = new ArrayList<>();
         ArrayList<String> cocktailNames = new ArrayList<>();
-        ArrayList<File> cocktailImages = new ArrayList<>();
+        ArrayList<Uri> cocktailImages = new ArrayList<>();
 
         for (int i = 0; cocktails != null && i < cocktails.size(); ++i) {
             CocktailModel cocktail = cocktails.get(cocktails.keyAt(i));
@@ -55,8 +55,8 @@ public class ItemListMainViewModel extends ViewModel {
             cocktailIds.add(cocktail.getId());
             cocktailNames.add(cocktail.getName());
 
-            if(cocktail.getImagePath() != null) {
-                cocktailImages.add(new File(cocktail.getImagePath()));
+            if(cocktail.getImageUri() != null) {
+                cocktailImages.add(Uri.parse(cocktail.getImageUri()));
             } else {
                 cocktailImages.add(null);
             }
