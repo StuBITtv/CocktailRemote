@@ -1,28 +1,40 @@
 package com.stubit.cocktailremote;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
-import com.stubit.cocktailremote.models.CocktailModel;
-import com.stubit.cocktailremote.modelviews.CocktailActivityViewModel;
 import com.stubit.cocktailremote.modelviews.EditActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
+import com.stubit.cocktailremote.views.CocktailImageView;
+
+import java.io.File;
 
 import static com.stubit.cocktailremote.CocktailActivity.ID_EXTRA_KEY;
 
 public class EditActivity extends AppCompatActivity {
 
     private EditActivityViewModel viewModel;
+    private final static int PICK_IMAGE = 1;
+    private final static int REQUEST_IMAGE_ACCESS = 2;
+
+    private Toast toast = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +51,36 @@ public class EditActivity extends AppCompatActivity {
                         getIntent().getIntExtra(ID_EXTRA_KEY, 0)
                 )
         ).get(EditActivityViewModel.class);
+
+        final CocktailImageView cocktailImageView = findViewById(R.id.cocktail_image);
+        final AppCompatActivity self = this;
+
+        cocktailImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int permissionStatus = ContextCompat.checkSelfPermission(
+                        getApplicationContext(),
+                        Manifest.permission.READ_EXTERNAL_STORAGE
+                );
+
+                if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(
+                            self,
+                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,},
+                            REQUEST_IMAGE_ACCESS
+                    );
+                } else {
+                    openGallery();
+                }
+            }
+        });
+
+        viewModel.getCocktailImage().observe(this, new Observer<File>() {
+            @Override
+            public void onChanged(File file) {
+                cocktailImageView.setImage(getApplicationContext(), file);
+            }
+        });
 
         setupTextInput(R.id.cocktailNameInput, new TextInputInterface() {
             @Override
@@ -84,6 +126,7 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
+        //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -100,7 +143,6 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_edit, menu);
         return true;
     }
@@ -140,16 +182,55 @@ public class EditActivity extends AppCompatActivity {
         void setText(String text);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == REQUEST_IMAGE_ACCESS && permissions[0].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if(grantResults[0] != 0) {
+                if(toast != null) {
+                    toast.cancel();
+                }
+
+                toast = Toast.makeText(this, R.string.permission_needed, Toast.LENGTH_SHORT);
+                toast.show();
+            } else {
+                openGallery();
+            }
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE) {
+        }
+    }
+
     private void exitEdit() {
         if(viewModel.getCocktailId() == null) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
             Intent showIntent = new Intent(this, CocktailActivity.class);
+
+            showIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             showIntent.putExtra(ID_EXTRA_KEY, viewModel.getCocktailId());
 
             startActivity(showIntent);
         }
 
         finish();
+    }
+
+    private void openGallery() {
+        Intent getIntent = new Intent(Intent.ACTION_GET_CONTENT);
+        getIntent.setType("image/*");
+
+        Intent pickIntent = new Intent(Intent.ACTION_PICK);
+        pickIntent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
+
+        Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+
+        startActivityForResult(chooserIntent, PICK_IMAGE);
     }
 }

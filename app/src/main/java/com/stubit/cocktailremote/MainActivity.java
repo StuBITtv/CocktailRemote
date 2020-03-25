@@ -6,14 +6,11 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.stubit.cocktailremote.adapters.CocktailAdapter;
-import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
-import android.view.Menu;
-import android.view.MenuItem;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 
 public class MainActivity extends AppCompatActivity {

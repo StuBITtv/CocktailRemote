@@ -1,21 +1,21 @@
 package com.stubit.cocktailremote;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.modelviews.CocktailActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
+import com.stubit.cocktailremote.views.CocktailImageView;
 import com.stubit.cocktailremote.views.TextView;
+
+import java.io.File;
 
 public class CocktailActivity extends AppCompatActivity {
 
@@ -54,6 +54,12 @@ public class CocktailActivity extends AppCompatActivity {
             }
         });
 
+        viewModel.getCocktailImage().observe(this, new Observer<File>() {
+            @Override
+            public void onChanged(File file) {
+                ((CocktailImageView)findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), file);
+            }
+        });
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -78,6 +84,8 @@ public class CocktailActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
             Intent editIntent = new Intent(this, EditActivity.class);
+
+            editIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
             editIntent.putExtra(ID_EXTRA_KEY, viewModel.getCocktailId());
 
             startActivity(editIntent);

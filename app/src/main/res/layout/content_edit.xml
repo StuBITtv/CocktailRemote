@@ -9,14 +9,13 @@
         tools:showIn="@layout/activity_edit"
         tools:context=".EditActivity"
         android:background="@color/colorPrimary">
-    <ImageView
+    <com.stubit.cocktailremote.views.CocktailImageView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             tools:srcCompat="@tools:sample/backgrounds/scenic[19]"
-            android:layout_marginTop="16dp"
             android:id="@+id/cocktail_image"
             android:scaleType="center"
             android:maxHeight="150sp"

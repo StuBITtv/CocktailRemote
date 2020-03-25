@@ -6,9 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
+import com.bumptech.glide.Glide;
 import com.stubit.cocktailremote.CocktailActivity;
 import com.stubit.cocktailremote.R;
 import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
@@ -59,14 +61,21 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
         if (mCocktailNames != null) {
-            String cocktailName = mViewModel.getCocktailNames().getValue().get(position);
+            String cocktailName = mCocktailNames.get(position);
             holder.mNameView.setText(cocktailName, R.string.unnamed_cocktail);
         }
 
-        /*  Glide.with(holder.mImageView)
-                .load(mViewModel.getCocktailImages().getValue().get(position))
-                .into(holder.mImageView);
-         */
+        if(mCocktailImages != null) {
+            File cocktailImage = mCocktailImages.get(position);
+
+            if (cocktailImage != null) {
+                Glide.with(holder.mImageView).load(cocktailImage).into(holder.mImageView);
+            } else {
+                holder.mImageView.setImageDrawable(
+                        ContextCompat.getDrawable(holder.mImageView.getContext(), R.drawable.ic_photo)
+                );
+            }
+        }
 
         holder.mHolder.setOnClickListener(new View.OnClickListener() {
             @Override
