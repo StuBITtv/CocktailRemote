@@ -10,7 +10,7 @@ public abstract class Database extends RoomDatabase {
 
     public static Database getDatabase(Context c) {
         if(mInstance == null) {
-            mInstance = Room.databaseBuilder(c, Database.class, "database").build();
+            mInstance = Room.databaseBuilder(c, Database.class, "database.db").build();
         }
 
         return mInstance;

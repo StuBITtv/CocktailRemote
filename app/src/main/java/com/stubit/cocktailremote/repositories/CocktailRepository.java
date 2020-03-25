@@ -77,7 +77,7 @@ public class CocktailRepository {
     }
 
     public void deleteCocktail(@NotNull final CocktailModel cocktailModel) {
-        deleteCocktailImage(cocktailModel.getImageUri());
+        deleteCocktailImage(Uri.parse(cocktailModel.getImageUri()));
 
         new Thread(new Runnable() {
             @Override
@@ -88,13 +88,11 @@ public class CocktailRepository {
         }).start();
     }
 
-    public Uri setCocktailImage(@NotNull Context c, @NotNull CocktailModel cocktailModel, Uri imageUri) throws IOException {
+    public Uri addCocktailImage(Context c, CocktailModel cocktailModel, Uri imageUri) throws IOException {
         InputStream inputStream = null;
         FileOutputStream outputStream = null;
 
         try {
-            deleteCocktailImage(cocktailModel.getImageUri());
-
             String fileTargetPath = c.getFilesDir().getPath() + File.separatorChar + new Date().getTime();
             Log.d(TAG, "Copying image to internal storage. The new path is " + fileTargetPath);
 
@@ -111,12 +109,6 @@ public class CocktailRepository {
 
             outputStream.flush();
 
-            cocktailModel.setImageUri(Uri.parse(fileTargetPath).toString());
-
-            if(cocktailModel.getId() == null) {
-                updateCocktail(cocktailModel);
-            }
-
             return Uri.parse(fileTargetPath);
         } finally {
             if(inputStream != null) {
@@ -129,17 +121,9 @@ public class CocktailRepository {
         }
     }
 
-    public void removeCocktailImage(@NotNull CocktailModel cocktailModel) {
-        if(cocktailModel.getImageUri() != null) {
-            deleteCocktailImage(cocktailModel.getImageUri());
-            cocktailModel.setImageUri(null);
-            updateCocktail(cocktailModel);
-        }
-    }
-
-    private void deleteCocktailImage(String cocktailImage) {
-        if(cocktailImage != null) {
-            File oldImage = new File(Uri.parse(cocktailImage).getPath());
+    public void deleteCocktailImage(Uri cocktailImageUri) {
+        if(cocktailImageUri != null) {
+            File oldImage = new File(cocktailImageUri.getPath());
 
             //noinspection ResultOfMethodCallIgnored
             oldImage.delete();

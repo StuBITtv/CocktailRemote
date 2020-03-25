@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer;
 import java.io.*;
 
 public class EditActivityViewModel extends CocktailActivityViewModel {
-    private MutableLiveData<Boolean> mUnsavedChanges = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mUnsavedChanges = new MutableLiveData<>(false);
 
     public EditActivityViewModel(Context c, LifecycleOwner owner, Integer cocktailId) {
         super(c, owner, cocktailId);
@@ -29,25 +29,50 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
     }
 
     public void setCocktailImageUri(Context c, Uri cocktailImageUri) throws IOException {
-        mCocktailImageUri.setValue(mCocktailRepository.setCocktailImage(c, mCocktail, cocktailImageUri));
+        deleteTempImage();
+
+        mCocktailImageUri.setValue(mCocktailRepository.addCocktailImage(c, mCocktail, cocktailImageUri));
         mUnsavedChanges.setValue(true);
     }
 
     public void deleteCocktailImage() {
-        mCocktailRepository.removeCocktailImage(mCocktail);
+        String filepath = mCocktail.getImageUri();
+
+        if (filepath != null) {
+            mCocktailRepository.deleteCocktailImage(Uri.parse(filepath));
+        }
+
     }
 
     public LiveData<Boolean> hasUnsavedChanges() {
         return mUnsavedChanges;
     }
 
+    public void cleanUp() {
+        //noinspection ConstantConditions
+        if (mUnsavedChanges.getValue() && mCocktailImageUri.getValue() != null) {
+            deleteTempImage();
+        }
+    }
+
+    private void deleteTempImage() {
+        if (
+                mCocktailImageUri.getValue() != null &&
+                !mCocktailImageUri.getValue().toString().equals(mCocktail.getImageUri())
+        ) {
+            mCocktailRepository.deleteCocktailImage(mCocktailImageUri.getValue());
+        }
+    }
+
     public void saveCocktail() {
         mCocktail.setName(mCocktailName.getValue());
         mCocktail.setDescription(mCocktailDescription.getValue());
 
+
         Uri imageUri = mCocktailImageUri.getValue();
 
-        if (imageUri != null) {
+        if (imageUri != null && !imageUri.toString().equals(mCocktail.getImageUri())) {
+            deleteCocktailImage();
             mCocktail.setImageUri(imageUri.toString());
         } else {
             mCocktail.setImageUri(null);

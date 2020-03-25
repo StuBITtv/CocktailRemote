@@ -79,6 +79,7 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
+
         mViewModel.getCocktailImageUri().observe(this, new Observer<Uri>() {
             @Override
             public void onChanged(Uri uri) {
@@ -229,8 +230,9 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private void exitEdit() {
+        mViewModel.cleanUp();
+
         if(mViewModel.getCocktailId() == null) {
-            mViewModel.deleteCocktailImage();
             startActivity(new Intent(this, MainActivity.class));
         } else {
             if(mSubmittedId != 0) {

@@ -5,8 +5,8 @@
         tools:context="com.stubit.cocktailremote.EditActivity"
 >
     <item
-            android:visible="true"
             app:showAsAction="always"
+            android:visible="true"
             android:icon="@drawable/ic_bin"
             android:title="@string/delete"
     />
