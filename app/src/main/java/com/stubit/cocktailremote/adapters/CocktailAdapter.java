@@ -106,9 +106,9 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        View mHolder;
-        TextView mNameView;
-        ImageView mImageView;
+        final View mHolder;
+        final TextView mNameView;
+        final ImageView mImageView;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);

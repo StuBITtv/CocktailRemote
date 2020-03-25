@@ -142,5 +142,5 @@ public class CocktailRepository {
 
     private static CocktailModel.Access mCocktailAccess;
     private MutableLiveData<SparseArray<CocktailModel>> mCocktails;
-    private MutableLiveData<Integer> mLatestId = new MutableLiveData<>(null);
+    private final MutableLiveData<Integer> mLatestId = new MutableLiveData<>(null);
 }

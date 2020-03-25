@@ -13,11 +13,11 @@ import java.util.ArrayList;
 public class ItemListMainViewModel extends ViewModel {
     private static final String TAG = "ItemListMainViewModel";
 
-    private MutableLiveData<ArrayList<Integer>> mCocktailIds = new MutableLiveData<>();
-    private MutableLiveData<ArrayList<String>> mCocktailNames = new MutableLiveData<>();
-    private MutableLiveData<ArrayList<Uri>> mCocktailImages = new MutableLiveData<>();
+    private final MutableLiveData<ArrayList<Integer>> mCocktailIds = new MutableLiveData<>();
+    private final MutableLiveData<ArrayList<String>> mCocktailNames = new MutableLiveData<>();
+    private final MutableLiveData<ArrayList<Uri>> mCocktailImages = new MutableLiveData<>();
 
-    private CocktailRepository mCocktailRepository;
+    private final CocktailRepository mCocktailRepository;
 
     public ItemListMainViewModel(Context c, LifecycleOwner owner) {
         mCocktailRepository = CocktailRepository.getRepository(c);

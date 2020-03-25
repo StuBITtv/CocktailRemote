@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer;
 import java.io.*;
 
 public class EditActivityViewModel extends CocktailActivityViewModel {
-    private MutableLiveData<Boolean> mUnsavedChanges = new MutableLiveData<>(false);
+    private final MutableLiveData<Boolean> mUnsavedChanges = new MutableLiveData<>(false);
 
     public EditActivityViewModel(Context c, LifecycleOwner owner, Integer cocktailId) {
         super(c, owner, cocktailId);

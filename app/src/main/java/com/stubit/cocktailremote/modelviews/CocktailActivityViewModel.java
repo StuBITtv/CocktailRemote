@@ -11,15 +11,15 @@ import java.util.List;
 
 public class CocktailActivityViewModel extends ViewModel {
     protected CocktailModel mCocktail;
-    protected MutableLiveData<String> mCocktailName = new MutableLiveData<>();
-    protected MutableLiveData<Uri> mCocktailImageUri = new MutableLiveData<>();
-    protected MutableLiveData<String> mCocktailDescription = new MutableLiveData<>();
-    protected MutableLiveData<List<String>> mCocktailIngredients = new MutableLiveData<>();
+    protected final MutableLiveData<String> mCocktailName = new MutableLiveData<>();
+    protected final MutableLiveData<Uri> mCocktailImageUri = new MutableLiveData<>();
+    protected final MutableLiveData<String> mCocktailDescription = new MutableLiveData<>();
+    protected final MutableLiveData<List<String>> mCocktailIngredients = new MutableLiveData<>();
 
 
     protected Integer mCocktailId;
-    protected CocktailRepository mCocktailRepository;
-    protected LifecycleOwner mOwner;
+    protected final CocktailRepository mCocktailRepository;
+    protected final LifecycleOwner mOwner;
 
     public CocktailActivityViewModel(Context c, LifecycleOwner owner, Integer cocktailId) {
         mCocktailId = cocktailId;

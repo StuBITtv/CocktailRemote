@@ -68,7 +68,7 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         throw new RuntimeException();
     }
 
-    private Context mC;
-    private LifecycleOwner mLifecycleOwner;
-    private Object[] mExtras;
+    private final Context mC;
+    private final LifecycleOwner mLifecycleOwner;
+    private final Object[] mExtras;
 }
