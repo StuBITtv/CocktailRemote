@@ -10,7 +10,6 @@ import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import android.view.View;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 
 public class MainActivity extends AppCompatActivity {
@@ -28,12 +27,7 @@ public class MainActivity extends AppCompatActivity {
         ).get(ItemListMainViewModel.class);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(getApplicationContext(), EditActivity.class));
-            }
-        });
+        fab.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), EditActivity.class)));
 
         RecyclerView cocktailList = findViewById(R.id.cocktail_list);
         cocktailList.setAdapter(

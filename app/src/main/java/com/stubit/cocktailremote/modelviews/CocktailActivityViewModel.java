@@ -5,17 +5,17 @@ import android.net.Uri;
 import android.util.SparseArray;
 import androidx.lifecycle.*;
 import com.stubit.cocktailremote.models.CocktailModel;
+import com.stubit.cocktailremote.models.IngredientModel;
 import com.stubit.cocktailremote.repositories.CocktailRepository;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class CocktailActivityViewModel extends ViewModel {
     protected CocktailModel mCocktail;
     protected final MutableLiveData<String> mCocktailName = new MutableLiveData<>();
     protected final MutableLiveData<Uri> mCocktailImageUri = new MutableLiveData<>();
     protected final MutableLiveData<String> mCocktailDescription = new MutableLiveData<>();
-    protected final MutableLiveData<List<String>> mCocktailIngredients = new MutableLiveData<>();
-
+    protected MutableLiveData<ArrayList<String>> mCocktailIngredientNames = new MutableLiveData<>();
 
     protected Integer mCocktailId;
     protected final CocktailRepository mCocktailRepository;
@@ -26,14 +26,9 @@ public class CocktailActivityViewModel extends ViewModel {
         mOwner = owner;
         mCocktailRepository = CocktailRepository.getRepository(c);
 
-        updateCocktail();
+        loadCocktailInfo();
 
-        mCocktailRepository.getCocktails().observe(mOwner, new Observer<SparseArray<CocktailModel>>() {
-            @Override
-            public void onChanged(SparseArray<CocktailModel> cocktailModelSparseArray) {
-                updateCocktail();
-            }
-        });
+        mCocktailRepository.getCocktails().observe(mOwner, cocktailModelSparseArray -> loadCocktailInfo());
     }
 
     public Integer getCocktailId() {
@@ -52,31 +47,45 @@ public class CocktailActivityViewModel extends ViewModel {
         return mCocktailDescription;
     }
 
-    public LiveData<List<String>> getCocktailIngredients() {
-        return mCocktailIngredients;
+    public LiveData<ArrayList<String>> getCocktailIngredientNames() {
+        return mCocktailIngredientNames;
     }
 
-    private void updateCocktail() {
+    protected void loadCocktailInfo() {
         SparseArray<CocktailModel> cocktails = mCocktailRepository.getCocktails().getValue();
 
-        if(cocktails != null) {
-            if(mCocktailId != 0) {
+        if (cocktails != null) {
+            if (mCocktailId != 0) {
                 mCocktail = cocktails.get(mCocktailId);
+
+                if (mCocktail == null) {
+                    mCocktail = new CocktailModel();
+                } else {
+                    mCocktailRepository.getIngredients(mCocktailId).observe(mOwner, ingredients -> {
+                        if (ingredients != null) {
+                            ArrayList<String> ingredientNames = new ArrayList<>();
+
+                            for (IngredientModel ingredient : ingredients) {
+                                ingredientNames.add(ingredient.getName());
+                            }
+
+                            mCocktailIngredientNames.postValue(ingredientNames);
+                        } else {
+                            mCocktailIngredientNames.postValue(new ArrayList<>());
+                        }
+                    });
+                }
             } else {
                 mCocktail = new CocktailModel();
             }
 
-            if(mCocktail != null) {
-                mCocktailName.setValue(mCocktail.getName());
-                mCocktailDescription.setValue(mCocktail.getDescription());
+            mCocktailName.setValue(mCocktail.getName());
+            mCocktailDescription.setValue(mCocktail.getDescription());
 
-                if(mCocktail.getImageUri() != null) {
-                    mCocktailImageUri.setValue(Uri.parse(mCocktail.getImageUri()));
-                } else {
-                    mCocktailImageUri.setValue(null);
-                }
-
-                mCocktailIngredients.setValue(null);
+            if (mCocktail.getImageUri() != null) {
+                mCocktailImageUri.setValue(Uri.parse(mCocktail.getImageUri()));
+            } else {
+                mCocktailImageUri.setValue(null);
             }
         }
     }

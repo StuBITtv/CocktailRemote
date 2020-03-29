@@ -10,7 +10,6 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
-import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.RecyclerView;
 import com.stubit.cocktailremote.CocktailActivity;
 import com.stubit.cocktailremote.R;
@@ -29,24 +28,18 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     public CocktailAdapter(LifecycleOwner owner, final ItemListMainViewModel viewModel) {
         mViewModel = viewModel;
 
-        mViewModel.getCocktailNames().observe(owner, new Observer<ArrayList<String>>() {
-            @Override
-            public void onChanged(ArrayList<String> cocktailNames) {
-                Log.d(TAG, "dataset changed");
+        mViewModel.getCocktailNames().observe(owner, cocktailNames -> {
+            Log.d(TAG, "dataset changed");
 
-                mCocktailNames = cocktailNames;
-                notifyDataSetChanged();
-            }
+            mCocktailNames = cocktailNames;
+            notifyDataSetChanged();
         });
 
-        mViewModel.getCocktailImageUris().observe(owner, new Observer<ArrayList<Uri>>() {
-            @Override
-            public void onChanged(ArrayList<Uri> uris) {
-                Log.d(TAG, "dataset changed");
+        mViewModel.getCocktailImageUris().observe(owner, uris -> {
+            Log.d(TAG, "dataset changed");
 
-                mCocktailImageUris = uris;
-                notifyDataSetChanged();
-            }
+            mCocktailImageUris = uris;
+            notifyDataSetChanged();
         });
     }
 
@@ -76,22 +69,19 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
             }
         }
 
-        holder.mHolder.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent cocktailDetailsIntent = new Intent(
-                        v.getContext(), CocktailActivity.class
+        holder.mHolder.setOnClickListener(v -> {
+            Intent cocktailDetailsIntent = new Intent(
+                    v.getContext(), CocktailActivity.class
+            );
+
+            if (mViewModel.getCocktailIds().getValue() != null) {
+                cocktailDetailsIntent.putExtra(
+                        CocktailActivity.ID_EXTRA_KEY,
+                        mViewModel.getCocktailIds().getValue().get(position)
                 );
-
-                if (mViewModel.getCocktailIds().getValue() != null) {
-                    cocktailDetailsIntent.putExtra(
-                            CocktailActivity.ID_EXTRA_KEY,
-                            mViewModel.getCocktailIds().getValue().get(position)
-                    );
-                }
-
-                v.getContext().startActivity(cocktailDetailsIntent);
             }
+
+            v.getContext().startActivity(cocktailDetailsIntent);
         });
     }
 

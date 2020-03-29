@@ -8,6 +8,7 @@ import java.util.List;
 @Entity
 public class CocktailModel {
     @PrimaryKey(autoGenerate = true)
+    @ColumnInfo(name = "id")
     protected Integer mId;
 
     @ColumnInfo(name = "name")

@@ -15,6 +15,10 @@ import java.util.Arrays;
 public class ViewModelFactory implements ViewModelProvider.Factory {
     public static final String TAG = "ViewModelFactory";
 
+    private final Context mC;
+    private final LifecycleOwner mLifecycleOwner;
+    private final Object[] mExtras;
+
     public ViewModelFactory(Context c, LifecycleOwner lifecycleOwner, Object ...extras) {
         mC = c;
         mLifecycleOwner = lifecycleOwner;
@@ -67,8 +71,4 @@ public class ViewModelFactory implements ViewModelProvider.Factory {
         Log.d(TAG, "Constructor could not be called: " + exception);
         throw new RuntimeException();
     }
-
-    private final Context mC;
-    private final LifecycleOwner mLifecycleOwner;
-    private final Object[] mExtras;
 }

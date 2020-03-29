@@ -1,16 +1,25 @@
 <resources>
     <string name="app_name">Cocktail Remote</string>
+
     <string name="title_activity_cocktail">Cocktail Details</string>
-    <string name="cocktail_image">Picture of the Cocktail</string>
+    <string name="title_activity_edit">Edit Cocktail</string>
+
+    <string name="cocktail_image">Picture of the cocktail</string>
+    <string name="image_not_found">Image not found.</string>
+
+    <string name="cocktail_name">Cocktail name</string>
+    <string name="unnamed_cocktail">Unnamed cocktail</string>
+
+    <string name="cocktail_description">Cocktail Description</string>
+    <string name="no_description">No description added yet.</string>
+
     <string name="ingredients">Ingredients</string>
     <string name="no_ingredients">No ingredients added yet.</string>
-    <string name="no_description">No description added yet.</string>
-    <string name="unnamed_cocktail">Unnamed Cocktail</string>
-    <string name="cocktail_name">Cocktail Name</string>
-    <string name="cocktail_description">Cocktail Description</string>
+    <string name="add_ingredient">Add ingredient</string>
+    <string name="unnamed_ingredient">Unnamed ingredient</string>
+
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
-    <string name="title_activity_edit">Edit Cocktail</string>
+
     <string name="permission_needed">Permission needed to pick cocktail image.</string>
-    <string name="not_found">Image not found.</string>
 </resources>

@@ -89,9 +89,7 @@
                 tools:ignore="LabelFor"
         />
         <TextView
-                app:layout_constraintEnd_toEndOf="@+id/cocktail_description"
                 app:layout_constraintStart_toStartOf="@+id/cocktail_description"
-                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintTop_toBottomOf="@+id/cocktail_description_input"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -101,24 +99,28 @@
                 android:id="@+id/ingredients_title"
                 android:textStyle="bold"
                 android:layout_marginTop="32dp"
-        />
-        <LinearLayout
-                app:layout_constraintTop_toBottomOf="@+id/ingredients_title"
+                app:layout_constraintEnd_toStartOf="@+id/add_ingredient_button" android:layout_marginRight="16dp"
+                android:layout_marginEnd="16dp"/>
+        <Button
+                android:text="@string/add_ingredient"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_ingredient_button"
+                android:background="@android:color/transparent" android:textColor="@color/colorAccent"
+                app:layout_constraintEnd_toEndOf="@+id/cocktail_description_input"
+                app:layout_constraintTop_toTopOf="@+id/ingredients_title"
+                app:layout_constraintBottom_toBottomOf="@+id/ingredients_title" android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"/>
+        <com.stubit.cocktailremote.views.IngredientListView
                 app:layout_constraintStart_toStartOf="@+id/ingredients_title"
-                app:layout_constraintEnd_toEndOf="@+id/ingredients_title"
+                app:layout_constraintEnd_toEndOf="@+id/cocktail_description_input"
                 android:orientation="vertical"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-        >
-            <com.stubit.cocktailremote.views.TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/no_ingredients"
-                    android:textColor="@android:color/white"
-                    android:text="@string/no_ingredients"
-                    android:textStyle="italic"
-            />
-        </LinearLayout>
+                android:id="@+id/ingredient_list" app:layout_constraintTop_toBottomOf="@+id/ingredients_title"
+                android:layout_marginTop="24dp" app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginBottom="64dp" app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintVertical_bias="0.0">
+        </com.stubit.cocktailremote.views.IngredientListView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.core.widget.NestedScrollView>

@@ -1,19 +1,19 @@
 package com.stubit.cocktailremote;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.stubit.cocktailremote.modelviews.CocktailActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 import com.stubit.cocktailremote.views.CocktailImageView;
+import com.stubit.cocktailremote.views.IngredientListView;
 import com.stubit.cocktailremote.views.TextView;
 
 public class CocktailActivity extends AppCompatActivity {
@@ -37,35 +37,43 @@ public class CocktailActivity extends AppCompatActivity {
                 )
         ).get(CocktailActivityViewModel.class);
 
-        viewModel.getCocktailName().observe(this, new Observer<String>() {
+        viewModel.getCocktailName().observe(this, cocktailName -> {
+            TextView cocktailNameView = findViewById(R.id.cocktail_name);
+            cocktailNameView.setText(cocktailName, R.string.unnamed_cocktail);
+        });
+
+        viewModel.getCocktailDescription().observe(this, cocktailDescription -> {
+            TextView cocktailDescriptionView = findViewById(R.id.cocktail_description);
+            cocktailDescriptionView.setText(cocktailDescription, R.string.no_description);
+        });
+
+        viewModel.getCocktailImageUri().observe(this, uri -> (
+                (CocktailImageView) findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), uri)
+        );
+
+        final IngredientListView ingredientListView = findViewById(R.id.ingredient_list);
+        ingredientListView.setViewHolder(new IngredientListView.Adapter() {
             @Override
-            public void onChanged(String cocktailName) {
-                TextView cocktailNameView = findViewById(R.id.cocktail_name);
-                cocktailNameView.setText(cocktailName, R.string.unnamed_cocktail);
+            public View inflateIngredientView(ViewGroup rootView) {
+                return getLayoutInflater().inflate(R.layout.item_ingredient, rootView, false);
+            }
+
+            @Override
+            public View inflateNoIngredientPlaceholderView(ViewGroup rootView) {
+                return getLayoutInflater().inflate(R.layout.item_ingredient_placeholder, rootView, false);
+            }
+
+            @Override
+            public void setupViewHolder(View holder, String name, int position) {
+                ((TextView) holder.findViewById(R.id.ingredient_name)).setText(name, R.string.unnamed_ingredient);
             }
         });
 
-        viewModel.getCocktailDescription().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(String cocktailDescription) {
-                TextView cocktailDescriptionView = findViewById(R.id.cocktail_description);
-                cocktailDescriptionView.setText(cocktailDescription, R.string.no_description);
-            }
-        });
-
-        viewModel.getCocktailImageUri().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(Uri uri) {
-                ((CocktailImageView)findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), uri);
-            }
-        });
+        viewModel.getCocktailIngredientNames().observe(this, ingredientListView::updateIngredients);
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
+        fab.setOnClickListener(view -> {
+            // TODO send bluetooth
         });
 
         //noinspection ConstantConditions
@@ -81,7 +89,7 @@ public class CocktailActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
+        if (item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
             Intent editIntent = new Intent(this, EditActivity.class);
 
             editIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);

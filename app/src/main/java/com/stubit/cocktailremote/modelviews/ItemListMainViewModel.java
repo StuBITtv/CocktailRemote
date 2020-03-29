@@ -22,12 +22,7 @@ public class ItemListMainViewModel extends ViewModel {
     public ItemListMainViewModel(Context c, LifecycleOwner owner) {
         mCocktailRepository = CocktailRepository.getRepository(c);
 
-        mCocktailRepository.getCocktails().observe(owner, new Observer<SparseArray<CocktailModel>>() {
-            @Override
-            public void onChanged(SparseArray<CocktailModel> cocktailModelSparseArray) {
-                updateLists();
-            }
-        });
+        mCocktailRepository.getCocktails().observe(owner, cocktailModelSparseArray -> updateLists());
     }
 
     public LiveData<ArrayList<Integer>> getCocktailIds() {

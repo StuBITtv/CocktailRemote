@@ -6,9 +6,9 @@ import android.util.Log;
 import android.util.SparseArray;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.models.Database;
+import com.stubit.cocktailremote.models.IngredientModel;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
@@ -22,11 +22,21 @@ import java.util.List;
 public class CocktailRepository {
     public static final String TAG = "CocktailRepository";
 
+    private static CocktailRepository mInstance;
+
+    private static CocktailModel.Access mCocktailAccess;
+    private static IngredientModel.Access mIngredientAccess;
+
+    private MutableLiveData<SparseArray<CocktailModel>> mCocktails;
+    private SparseArray<MutableLiveData<List<IngredientModel>>> mIngredients = new SparseArray<>();
+    private final MutableLiveData<Integer> mLatestCocktailId = new MutableLiveData<>(null);
+
     public static CocktailRepository getRepository(Context c) {
         if (mInstance == null) {
             mInstance = new CocktailRepository();
 
-            mCocktailAccess = Database.getDatabase(c).CocktailAccess();
+            mCocktailAccess = Database.getDatabase(c).getCocktailAccess();
+            mIngredientAccess = Database.getDatabase(c).getIngredientAccess();
         }
 
         return mInstance;
@@ -36,55 +46,59 @@ public class CocktailRepository {
         if (mCocktails == null) {
             mCocktails = new MutableLiveData<>();
 
-            mCocktailAccess.all().observeForever(new Observer<List<CocktailModel>>() {
-                @Override
-                public void onChanged(List<CocktailModel> cocktails) {
-                    SparseArray<CocktailModel> newCocktails = new SparseArray<>();
+            mCocktailAccess.all().observeForever(cocktails -> {
+                SparseArray<CocktailModel> newCocktails = new SparseArray<>();
 
-                    if (cocktails != null) {
-                        for (CocktailModel cocktail : cocktails) {
-                            newCocktails.append(cocktail.getId(), cocktail);
-                        }
+                if (cocktails != null) {
+                    for (CocktailModel cocktail : cocktails) {
+                        newCocktails.append(cocktail.getId(), cocktail);
                     }
-
-                    mCocktails.postValue(newCocktails);
-                    Log.d(TAG, "CocktailList updated");
                 }
+
+                mCocktails.postValue(newCocktails);
+                Log.d(TAG, "CocktailList updated");
             });
         }
 
         return mCocktails;
     }
 
+    public LiveData<List<IngredientModel>> getIngredients(final int cocktailId) {
+        if (mIngredients.get(cocktailId) == null) {
+            mIngredients.append(cocktailId, new MutableLiveData<>());
+
+            mIngredientAccess.getAllFromCocktail(cocktailId).observeForever(ingredientModels -> {
+                mIngredients.get(cocktailId).postValue(ingredientModels);
+                Log.d(TAG, "IngredientList updated");
+            });
+        }
+
+        return mIngredients.get(cocktailId);
+    }
+
+
     public void addCocktail(final CocktailModel cocktailModel) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mLatestId.postValue(mCocktailAccess.addModel(cocktailModel).intValue());
-                Log.d(TAG, "CocktailModel added to database");
-            }
+        new Thread(() -> {
+            mLatestCocktailId.postValue(mCocktailAccess.addModel(cocktailModel).intValue());
+            Log.d(TAG, "CocktailModel added to database");
         }).start();
     }
 
     public void updateCocktail(final CocktailModel cocktailModel) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mCocktailAccess.updateModel(cocktailModel);
-                Log.d(TAG, "CocktailModel updated");
-            }
+        new Thread(() -> {
+            mCocktailAccess.updateModel(cocktailModel);
+            Log.d(TAG, "CocktailModel updated");
         }).start();
     }
 
     public void deleteCocktail(@NotNull final CocktailModel cocktailModel) {
-        deleteCocktailImage(Uri.parse(cocktailModel.getImageUri()));
+        if(cocktailModel.getImageUri() != null) {
+            deleteCocktailImage(Uri.parse(cocktailModel.getImageUri()));
+        }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                mCocktailAccess.deleteModel(cocktailModel);
-                Log.d(TAG, "CocktailModel deleted");
-            }
+        new Thread(() -> {
+            mCocktailAccess.deleteModel(cocktailModel);
+            Log.d(TAG, "CocktailModel deleted");
         }).start();
     }
 
@@ -130,17 +144,32 @@ public class CocktailRepository {
         }
     }
 
-    public LiveData<Integer> latestId() {
-        return mLatestId;
+    public LiveData<Integer> latestCocktailId() {
+        return mLatestCocktailId;
     }
 
-    public void resetLatestId() {
-        mLatestId.setValue(null);
+    public void resetLatestCocktailId() {
+        mLatestCocktailId.setValue(null);
     }
 
-    private static CocktailRepository mInstance;
+    public void addIngredient(final IngredientModel ingredientModel) {
+        new Thread(() -> {
+            mIngredientAccess.addModel(ingredientModel);
+            Log.d(TAG, "IngredientModel added");
+        }).start();
+    }
 
-    private static CocktailModel.Access mCocktailAccess;
-    private MutableLiveData<SparseArray<CocktailModel>> mCocktails;
-    private final MutableLiveData<Integer> mLatestId = new MutableLiveData<>(null);
+    public void updateIngredient(final IngredientModel ingredientModel) {
+        new Thread(() -> {
+            mIngredientAccess.updateModel(ingredientModel);
+            Log.d(TAG, "IngredientModel updated");
+        }).start();
+    }
+
+    public void deleteIngredient(final IngredientModel ingredientModel) {
+        new Thread(() -> {
+            mIngredientAccess.deleteModel(ingredientModel);
+            Log.d(TAG, "IngredientModel deleted");
+        }).start();
+    }
 }

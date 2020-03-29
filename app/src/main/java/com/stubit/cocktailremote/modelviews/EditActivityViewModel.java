@@ -2,15 +2,23 @@ package com.stubit.cocktailremote.modelviews;
 
 import android.content.Context;
 import android.net.Uri;
+import android.util.SparseArray;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import com.stubit.cocktailremote.models.IngredientModel;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EditActivityViewModel extends CocktailActivityViewModel {
     private final MutableLiveData<Boolean> mUnsavedChanges = new MutableLiveData<>(false);
+
+    private List<IngredientModel> mIngredientModels = new ArrayList<>();
+    private List<IngredientModel> mDeleteIngredients = new ArrayList<>();
+    private SparseArray<IngredientModel> mUpdatedIngredients = new SparseArray<>();
 
     public EditActivityViewModel(Context c, LifecycleOwner owner, Integer cocktailId) {
         super(c, owner, cocktailId);
@@ -44,8 +52,76 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
 
     }
 
+    public void addIngredient() {
+        ArrayList<String> newIngredientNames = mCocktailIngredientNames.getValue();
+
+        if (newIngredientNames == null) {
+            newIngredientNames = new ArrayList<>();
+        }
+
+        newIngredientNames.add(null);
+        mIngredientModels.add(new IngredientModel(getCocktailId()));
+
+        mCocktailIngredientNames.setValue(newIngredientNames);
+
+        mUnsavedChanges.setValue(true);
+    }
+
+    public void updateIngredient(int position, String ingredientName) {
+        ArrayList<String> newIngredients = mCocktailIngredientNames.getValue();
+
+        if (newIngredients != null) {
+            newIngredients.set(position, ingredientName);
+            mCocktailIngredientNames.setValue(newIngredients);
+
+            IngredientModel ingredientModel = mIngredientModels.get(position);
+            ingredientModel.setName(ingredientName);
+
+            if (ingredientModel.getId() != null) {
+                mUpdatedIngredients.append(ingredientModel.getId(), ingredientModel);
+            }
+        }
+
+        mUnsavedChanges.setValue(true);
+    }
+
+    public void deleteIngredient(int position) {
+        ArrayList<String> newIngredients = mCocktailIngredientNames.getValue();
+
+        if (newIngredients != null) {
+            newIngredients.remove(position);
+            mCocktailIngredientNames.setValue(newIngredients);
+
+            IngredientModel ingredientModel = mIngredientModels.get(position);
+
+            if (ingredientModel.getId() != null) {
+                mDeleteIngredients.add(mIngredientModels.get(position));
+                mUpdatedIngredients.remove(mIngredientModels.get(position).getId());
+            }
+
+            mIngredientModels.remove(position);
+        }
+
+        mUnsavedChanges.setValue(true);
+    }
+
     public LiveData<Boolean> hasUnsavedChanges() {
         return mUnsavedChanges;
+    }
+
+    @Override
+    protected void loadCocktailInfo() {
+        super.loadCocktailInfo();
+
+        if (mCocktailId != 0) {
+            mCocktailRepository.getIngredients(mCocktailId).observe(mOwner,
+                    ingredientModels -> mIngredientModels = new ArrayList<>(ingredientModels)
+            );
+        }
+
+        if (mCocktailIngredientNames.getValue() != null) {
+            mCocktailIngredientNames.setValue(new ArrayList<>(mCocktailIngredientNames.getValue()));
+        }
     }
 
     public void cleanUp() {
@@ -58,16 +134,15 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
     private void deleteTempImage() {
         if (
                 mCocktailImageUri.getValue() != null &&
-                !mCocktailImageUri.getValue().toString().equals(mCocktail.getImageUri())
+                        !mCocktailImageUri.getValue().toString().equals(mCocktail.getImageUri())
         ) {
             mCocktailRepository.deleteCocktailImage(mCocktailImageUri.getValue());
         }
     }
 
-    public void saveCocktail() {
+    public void saveCocktailAndIngredients() {
         mCocktail.setName(mCocktailName.getValue());
         mCocktail.setDescription(mCocktailDescription.getValue());
-
 
         Uri imageUri = mCocktailImageUri.getValue();
 
@@ -81,19 +156,33 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
         if (mCocktail.getId() != null) {
             mCocktailRepository.updateCocktail(mCocktail);
         } else {
-            mCocktailRepository.latestId().observe(mOwner, new Observer<Integer>() {
+            mCocktailRepository.latestCocktailId().observe(mOwner, new Observer<Integer>() {
                 @Override
                 public void onChanged(Integer newId) {
                     if (newId != null) {
                         mCocktailId = newId;
-                        mCocktailRepository.latestId().removeObserver(this);
+                        mCocktailRepository.latestCocktailId().removeObserver(this);
 
-                        mCocktailRepository.resetLatestId();
+                        mCocktailRepository.resetLatestCocktailId();
                     }
                 }
             });
 
             mCocktailRepository.addCocktail(mCocktail);
+        }
+
+        for (int i = 0; i < mUpdatedIngredients.size(); ++i) {
+            mCocktailRepository.updateIngredient(mUpdatedIngredients.get(mUpdatedIngredients.keyAt(i)));
+        }
+
+        for (IngredientModel ingredient : mIngredientModels) {
+            if (ingredient.getId() == null) {
+                mCocktailRepository.addIngredient(ingredient);
+            }
+        }
+
+        for (IngredientModel ingredient : mDeleteIngredients) {
+            mCocktailRepository.deleteIngredient(ingredient);
         }
 
         mUnsavedChanges.setValue(false);

@@ -9,13 +9,13 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,13 +24,15 @@ import android.view.View;
 import com.stubit.cocktailremote.modelviews.EditActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 import com.stubit.cocktailremote.views.CocktailImageView;
+import com.stubit.cocktailremote.views.IngredientListView;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 import static com.stubit.cocktailremote.CocktailActivity.ID_EXTRA_KEY;
 
 public class EditActivity extends AppCompatActivity {
-
     private EditActivityViewModel mViewModel;
     private final static int PICK_IMAGE = 1;
     private final static int REQUEST_IMAGE_ACCESS = 2;
@@ -59,35 +61,26 @@ public class EditActivity extends AppCompatActivity {
         final CocktailImageView cocktailImageView = findViewById(R.id.cocktail_image);
         final AppCompatActivity self = this;
 
-        cocktailImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int permissionStatus = ContextCompat.checkSelfPermission(
-                        getApplicationContext(),
-                        Manifest.permission.READ_EXTERNAL_STORAGE
+        cocktailImageView.setOnClickListener(v -> {
+            int permissionStatus = ContextCompat.checkSelfPermission(
+                    getApplicationContext(),
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+            );
+
+            if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(
+                        self,
+                        new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,},
+                        REQUEST_IMAGE_ACCESS
                 );
-
-                if (permissionStatus != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(
-                            self,
-                            new String[]{Manifest.permission.READ_EXTERNAL_STORAGE,},
-                            REQUEST_IMAGE_ACCESS
-                    );
-                } else {
-                    openGallery();
-                }
+            } else {
+                openGallery();
             }
         });
 
+        mViewModel.getCocktailImageUri().observe(this, uri -> cocktailImageView.setImage(getApplicationContext(), uri));
 
-        mViewModel.getCocktailImageUri().observe(this, new Observer<Uri>() {
-            @Override
-            public void onChanged(Uri uri) {
-                cocktailImageView.setImage(getApplicationContext(), uri);
-            }
-        });
-
-        setupTextInput(R.id.cocktail_name_input, new TextInputInterface() {
+        setupTextInput(null, R.id.cocktail_name_input, new TextInputInterface() {
             @Override
             public String getText() {
                 return mViewModel.getCocktailName().getValue();
@@ -99,7 +92,7 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-        setupTextInput(R.id.cocktail_description_input, new TextInputInterface() {
+        setupTextInput(null, R.id.cocktail_description_input, new TextInputInterface() {
             @Override
             public String getText() {
                 return mViewModel.getCocktailDescription().getValue();
@@ -111,29 +104,87 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
+        final IngredientListView ingredientListView = findViewById(R.id.ingredient_list);
+        ingredientListView.setViewHolder(new IngredientListView.Adapter() {
+            @Override
+            public View inflateIngredientView(ViewGroup rootView) {
+                return getLayoutInflater().inflate(R.layout.item_ingredient_edit, rootView, false);
+            }
+
+            @Override
+            public View inflateNoIngredientPlaceholderView(ViewGroup rootView) {
+                return getLayoutInflater().inflate(R.layout.item_ingredient_placeholder, rootView, false);
+            }
+
+            @Override
+            public void setupViewHolder(final View holder, final String name, final int position) {
+                setupTextInput(holder, R.id.ingredient_name_input, new TextInputInterface() {
+                    @Override
+                    public String getText() {
+                        return name;
+                    }
+
+                    @Override
+                    public void setText(String newIngredientName) {
+                        mViewModel.updateIngredient(position, newIngredientName);
+                    }
+                });
+
+                holder.findViewById(R.id.delete_button).setOnClickListener(v -> {
+                    mViewModel.deleteIngredient(position);
+
+                    ArrayList<String> newCocktailNames = mViewModel.getCocktailIngredientNames().getValue();
+                    ingredientListView.updateIngredients(newCocktailNames);
+
+                    if (newCocktailNames != null && newCocktailNames.size() != 0) {
+                        int newFocusedPosition = position;
+
+                        if(position >= ingredientListView.getChildCount()) {
+                            newFocusedPosition--;
+                        }
+
+                        ingredientListView.getChildAt(newFocusedPosition).requestFocus();
+                        EditText ingredientInput = ingredientListView.getChildAt(newFocusedPosition).findViewById(
+                                R.id.ingredient_name_input
+                        );
+
+                        ingredientInput.setSelection(ingredientInput.getText().length());
+                    } else {
+                        findViewById(R.id.cocktail_name_input).clearFocus();    // else gains focus automatically
+                    }
+                });
+            }
+        });
+
+        mViewModel.getCocktailIngredientNames().observe(this, ingredients -> {
+            mViewModel.getCocktailIngredientNames().removeObservers(this);
+            ingredientListView.updateIngredients(ingredients);
+        });
+
         final FloatingActionButton fab = findViewById(R.id.fab);
 
-        mViewModel.hasUnsavedChanges().observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(Boolean unsavedChanges) {
-                if (unsavedChanges) {
-                    fab.setVisibility(View.VISIBLE);
-                } else {
-                    fab.setVisibility(View.GONE);
-                }
+        mViewModel.hasUnsavedChanges().observe(this, unsavedChanges -> {
+            if (unsavedChanges) {
+                fab.setVisibility(View.VISIBLE);
+            } else {
+                fab.setVisibility(View.GONE);
             }
         });
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mViewModel.saveCocktail();
-            }
+        findViewById(R.id.add_ingredient_button).setOnClickListener(v -> {
+            mViewModel.addIngredient();
+            ingredientListView.updateIngredients(mViewModel.getCocktailIngredientNames().getValue());
+            ingredientListView.getChildAt(ingredientListView.getChildCount() - 1).requestFocus();
         });
+
+        fab.setOnClickListener(view -> mViewModel.saveCocktailAndIngredients());
 
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {}
 
     @Override
     public boolean onSupportNavigateUp() {
@@ -164,8 +215,15 @@ public class EditActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private void setupTextInput(int resId, final TextInputInterface inputInterface) {
-        EditText textInput = findViewById(resId);
+    private void setupTextInput(final View viewRoot, int resId, @NotNull final TextInputInterface inputInterface) {
+        EditText textInput;
+
+        if (viewRoot != null) {
+            textInput = viewRoot.findViewById(resId);
+        } else {
+            textInput = findViewById(resId);
+        }
+
         textInput.setText(inputInterface.getText());
 
         textInput.addTextChangedListener(new TextWatcher() {
@@ -212,7 +270,7 @@ public class EditActivity extends AppCompatActivity {
                             mViewModel.setCocktailImageUri(this, imageUri);
                         } catch (IOException e) {
                             e.printStackTrace();
-                            showToast(R.string.not_found);
+                            showToast(R.string.image_not_found);
                         }
                     }
                 }
