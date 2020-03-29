@@ -155,6 +155,7 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
 
         if (mCocktail.getId() != null) {
             mCocktailRepository.updateCocktail(mCocktail);
+            saveIngredients();
         } else {
             mCocktailRepository.latestCocktailId().observe(mOwner, new Observer<Integer>() {
                 @Override
@@ -164,6 +165,12 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
                         mCocktailRepository.latestCocktailId().removeObserver(this);
 
                         mCocktailRepository.resetLatestCocktailId();
+
+                        for(IngredientModel ingredient : mIngredientModels) {
+                            ingredient.setCocktail(mCocktailId);
+                        }
+
+                        saveIngredients();
                     }
                 }
             });
@@ -171,6 +178,15 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
             mCocktailRepository.addCocktail(mCocktail);
         }
 
+        mUnsavedChanges.setValue(false);
+    }
+
+    public void deleteCocktail() {
+        mUnsavedChanges.setValue(false);
+        mCocktailRepository.deleteCocktail(mCocktail);
+    }
+
+    private void saveIngredients() {
         for (int i = 0; i < mUpdatedIngredients.size(); ++i) {
             mCocktailRepository.updateIngredient(mUpdatedIngredients.get(mUpdatedIngredients.keyAt(i)));
         }
@@ -184,12 +200,5 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
         for (IngredientModel ingredient : mDeleteIngredients) {
             mCocktailRepository.deleteIngredient(ingredient);
         }
-
-        mUnsavedChanges.setValue(false);
-    }
-
-    public void deleteCocktail() {
-        mUnsavedChanges.setValue(false);
-        mCocktailRepository.deleteCocktail(mCocktail);
     }
 }

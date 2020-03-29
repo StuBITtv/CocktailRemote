@@ -35,6 +35,10 @@ public class IngredientModel {
         return mId;
     }
 
+    public void setCocktail(Integer mCocktailId) {
+        this.mCocktailId = mCocktailId;
+    }
+
     public String getName() {
         return mName;
     }
