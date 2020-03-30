@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.SparseArray;
 import androidx.lifecycle.*;
-import com.stubit.cocktailremote.CocktailActivity;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.models.IngredientModel;
 import com.stubit.cocktailremote.repositories.CocktailRepository;

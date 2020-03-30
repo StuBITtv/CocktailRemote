@@ -38,8 +38,6 @@ import java.util.ArrayList;
 import static com.stubit.cocktailremote.CocktailActivity.ID_EXTRA_KEY;
 
 public class EditActivity extends AppCompatActivity {
-    public static final String TAG = "EditActivity";
-
     private EditActivityViewModel mViewModel;
     private final static int PICK_IMAGE = 1;
     private final static int REQUEST_IMAGE_ACCESS = 2;
