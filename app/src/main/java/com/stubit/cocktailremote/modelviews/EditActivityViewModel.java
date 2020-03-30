@@ -170,7 +170,7 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
             mCocktailRepository.updateCocktail(mCocktail);
             saveIngredients();
         } else {
-            mCocktailRepository.latestCocktailId().observe(mOwner, new Observer<Integer>() {
+            mCocktailRepository.latestCocktailId().observeForever(new Observer<Integer>() {
                 @Override
                 public void onChanged(Integer newId) {
                     if (newId != null) {
