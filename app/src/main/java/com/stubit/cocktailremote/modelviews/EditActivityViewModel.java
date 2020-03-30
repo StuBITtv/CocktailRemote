@@ -179,7 +179,7 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
 
                         mCocktailRepository.resetLatestCocktailId();
 
-                        for(IngredientModel ingredient : mIngredientModels) {
+                        for (IngredientModel ingredient : mIngredientModels) {
                             ingredient.setCocktail(mCocktailId);
                         }
 

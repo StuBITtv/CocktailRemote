@@ -10,7 +10,6 @@ import android.text.Editable;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.text.method.DigitsKeyListener;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -66,7 +65,7 @@ public class EditActivity extends AppCompatActivity {
                         mSubmittedId
                 )
         ).get(EditActivityViewModel.class);
-        // end region
+        // endregion
 
         // region setup cocktail image
         final CocktailImageView cocktailImageView = findViewById(R.id.cocktail_image);
@@ -202,104 +201,8 @@ public class EditActivity extends AppCompatActivity {
         final TextWatcher[] signalChangeWatcher = {null};
 
         final RadioButton typeInputBinary = findViewById(R.id.type_input_binary);
-        typeInputBinary.setOnCheckedChangeListener((v, checked) -> {
-            if(checked) {
-                mViewModel.setCocktailSignalType(CocktailModel.SignalType.BINARY);
-
-                signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
-                signalInput.setKeyListener(DigitsKeyListener.getInstance("01"));
-                signalInput.removeTextChangedListener(signalChangeWatcher[0]);
-            }
-        });
-
-        final RadioButton typeInputInteger = findViewById(R.id.type_input_number);
-        typeInputInteger.setOnCheckedChangeListener((v, checked) -> {
-            if(checked) {
-                mViewModel.setCocktailSignalType(CocktailModel.SignalType.INTEGER);
-
-                signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
-                signalInput.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
-                signalInput.removeTextChangedListener(signalChangeWatcher[0]);
-
-                // region setup number negative converter
-                signalChangeWatcher[0] = new TextWatcher() {
-                    @Override
-                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onTextChanged(CharSequence s, int start, int before, int count) {
-                        int cursorPosition = signalInput.getSelectionStart();
-
-                        if(s.length() > 1) {
-                            String numberEnding = s.toString().substring(1);
-
-                            if(numberEnding.contains("-")) {
-                                numberEnding = s.toString().substring(1).replace("-", "");
-                                char numberStart = s.toString().charAt(0);
-
-                                int positionOffset = 0;
-
-                                if(numberStart != '-') {
-                                    signalInput.setText("-" + numberStart + numberEnding);
-                                } else {
-                                    signalInput.setText(numberEnding);
-                                    positionOffset = 2;
-                                }
-
-                                int textLength = signalInput.getText().length();
-
-                                if(cursorPosition - positionOffset > textLength) {
-                                    positionOffset = cursorPosition - textLength;
-                                } else if (cursorPosition - positionOffset < 0) {
-                                    positionOffset = cursorPosition;
-                                }
-
-                                signalInput.setSelection(cursorPosition - positionOffset);
-                            }
-                        }
-
-                        setRadioButtonEnable(typeInputBinary, isBinary(signalInput.getText().toString()));
-                    }
-
-                    @Override
-                    public void afterTextChanged(Editable s) {}
-                };
-                // endregion
-
-                signalInput.addTextChangedListener(signalChangeWatcher[0]);
-            }
-        });
-
+        final RadioButton typeInputInteger = findViewById(R.id.type_input_integer);
         final RadioButton typeInputString = findViewById(R.id.type_input_string);
-        typeInputString.setOnCheckedChangeListener((v, checked) -> {
-            if(checked) {
-                mViewModel.setCocktailSignalType(CocktailModel.SignalType.STRING);
-
-                signalInput.setInputType(InputType.TYPE_CLASS_TEXT);
-                signalInput.removeTextChangedListener(signalChangeWatcher[0]);
-
-                signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
-
-                signalInput.addTextChangedListener(signalChangeWatcher[0]);
-            }
-        });
-
-        signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
-        signalInput.addTextChangedListener(signalChangeWatcher[0]);
-
-        signalInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                mViewModel.setCocktailSignal(s.toString());
-            }
-        });
 
         mViewModel.getCocktailSignalType().observe(this, type -> {
             switch (type) {
@@ -317,10 +220,107 @@ public class EditActivity extends AppCompatActivity {
             }
 
             mViewModel.getCocktailSignalType().removeObservers(this);
+
+            typeInputBinary.setOnCheckedChangeListener((v, checked) -> {
+                if(checked) {
+                    mViewModel.setCocktailSignalType(CocktailModel.SignalType.BINARY);
+
+                    signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    signalInput.setKeyListener(DigitsKeyListener.getInstance("01"));
+                    signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+                }
+            });
+
+            typeInputInteger.setOnCheckedChangeListener((v, checked) -> {
+                if(checked) {
+                    mViewModel.setCocktailSignalType(CocktailModel.SignalType.INTEGER);
+
+                    signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    signalInput.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
+                    signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+
+                    // region setup number negative converter
+                    signalChangeWatcher[0] = new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                        @SuppressLint("SetTextI18n")
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {
+                            int cursorPosition = signalInput.getSelectionStart();
+
+                            if(s.length() > 1) {
+                                String numberEnding = s.toString().substring(1);
+
+                                if(numberEnding.contains("-")) {
+                                    numberEnding = s.toString().substring(1).replace("-", "");
+                                    char numberStart = s.toString().charAt(0);
+
+                                    int positionOffset = 0;
+
+                                    if(numberStart != '-') {
+                                        signalInput.setText("-" + numberStart + numberEnding);
+                                    } else {
+                                        signalInput.setText(numberEnding);
+                                        positionOffset = 2;
+                                    }
+
+                                    int textLength = signalInput.getText().length();
+
+                                    if(cursorPosition - positionOffset > textLength) {
+                                        positionOffset = cursorPosition - textLength;
+                                    } else if (cursorPosition - positionOffset < 0) {
+                                        positionOffset = cursorPosition;
+                                    }
+
+                                    signalInput.setSelection(cursorPosition - positionOffset);
+                                }
+                            }
+
+                            setRadioButtonEnable(typeInputBinary, isBinary(signalInput.getText().toString()));
+                        }
+
+                        @Override
+                        public void afterTextChanged(Editable s) {}
+                    };
+                    // endregion
+
+                    signalInput.addTextChangedListener(signalChangeWatcher[0]);
+                }
+            });
+
+            typeInputString.setOnCheckedChangeListener((v, checked) -> {
+                if(checked) {
+                    mViewModel.setCocktailSignalType(CocktailModel.SignalType.STRING);
+
+                    signalInput.setInputType(InputType.TYPE_CLASS_TEXT);
+                    signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+
+                    signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
+
+                    signalInput.addTextChangedListener(signalChangeWatcher[0]);
+                }
+            });
         });
 
         mViewModel.getCocktailSignal().observe(this, signal -> {
             signalInput.setText(signal);
+
+            signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
+            signalInput.addTextChangedListener(signalChangeWatcher[0]);
+
+            signalInput.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                    mViewModel.setCocktailSignal(s.toString());
+                }
+            });
 
             mViewModel.getCocktailSignal().removeObservers(this);
         });

@@ -161,7 +161,7 @@
                         app:buttonTint="@color/colorAccent"
                         android:text="@string/integer"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/type_input_number"
+                        android:layout_height="wrap_content" android:id="@+id/type_input_integer"
                         android:textColor="@android:color/white" android:layout_marginRight="@dimen/radio_button_margin"
                         android:layout_marginEnd="@dimen/radio_button_margin"/>
                 <RadioButton
