@@ -304,6 +304,9 @@ public class EditActivity extends AppCompatActivity {
         mViewModel.getCocktailSignal().observe(this, signal -> {
             signalInput.setText(signal);
 
+            setRadioButtonEnable(typeInputInteger, isInteger(signal));
+            setRadioButtonEnable(typeInputBinary, isBinary(signal));
+
             signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
             signalInput.addTextChangedListener(signalChangeWatcher[0]);
 
