@@ -6,7 +6,9 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import java.util.ArrayList;
 
@@ -16,15 +18,15 @@ public class IngredientListView extends LinearLayout {
     Adapter mAdapter;
     Boolean mPlaceholder;
 
-    public IngredientListView(Context context) {
+    public IngredientListView(@NonNull Context context) {
         super(context);
     }
 
-    public IngredientListView(Context context, @Nullable AttributeSet attrs) {
+    public IngredientListView(@NonNull Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public IngredientListView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public IngredientListView(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
@@ -71,7 +73,6 @@ public class IngredientListView extends LinearLayout {
 
         mPlaceholder = true;
     }
-
 
     public interface Adapter {
         View inflateIngredientView(ViewGroup rootView);

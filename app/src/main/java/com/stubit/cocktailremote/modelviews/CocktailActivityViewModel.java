@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.Uri;
 import android.util.SparseArray;
 import androidx.lifecycle.*;
+import com.stubit.cocktailremote.CocktailActivity;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.models.IngredientModel;
 import com.stubit.cocktailremote.repositories.CocktailRepository;
@@ -15,7 +16,9 @@ public class CocktailActivityViewModel extends ViewModel {
     protected final MutableLiveData<String> mCocktailName = new MutableLiveData<>();
     protected final MutableLiveData<Uri> mCocktailImageUri = new MutableLiveData<>();
     protected final MutableLiveData<String> mCocktailDescription = new MutableLiveData<>();
-    protected MutableLiveData<ArrayList<String>> mCocktailIngredientNames = new MutableLiveData<>();
+    protected final MutableLiveData<ArrayList<String>> mCocktailIngredientNames = new MutableLiveData<>();
+    protected final MutableLiveData<CocktailModel.SignalType> mCocktailSignalType = new MutableLiveData<>();
+    protected final MutableLiveData<String> mCocktailSignal = new MutableLiveData<>();
 
     protected Integer mCocktailId;
     protected final CocktailRepository mCocktailRepository;
@@ -49,6 +52,14 @@ public class CocktailActivityViewModel extends ViewModel {
 
     public LiveData<ArrayList<String>> getCocktailIngredientNames() {
         return mCocktailIngredientNames;
+    }
+
+    public LiveData<CocktailModel.SignalType> getCocktailSignalType() {
+        return mCocktailSignalType;
+    }
+
+    public LiveData<String> getCocktailSignal() {
+        return mCocktailSignal;
     }
 
     protected void loadCocktailInfo() {
@@ -87,6 +98,12 @@ public class CocktailActivityViewModel extends ViewModel {
             } else {
                 mCocktailImageUri.setValue(null);
             }
+
+            mCocktailSignalType.setValue(
+                    mCocktail.getSignalType() != null ? mCocktail.getSignalType() : CocktailModel.SignalType.STRING
+            );
+
+            mCocktailSignal.setValue(mCocktail.getSignal());
         }
     }
 }

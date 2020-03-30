@@ -20,6 +20,12 @@ public class CocktailModel {
     @ColumnInfo(name = "description")
     protected String mDescription;
 
+    @ColumnInfo(name = "signal_type")
+    protected SignalType mSignalType;
+
+    @ColumnInfo(name = "signal")
+    protected String mSignal;
+
     public CocktailModel() {}
 
     public Integer getId() {
@@ -48,6 +54,26 @@ public class CocktailModel {
 
     public void setDescription(String mDescription) {
         this.mDescription = mDescription;
+    }
+
+    public SignalType getSignalType() {
+        return mSignalType;
+    }
+
+    public void setSignalType(SignalType mSignalType) {
+        this.mSignalType = mSignalType;
+    }
+
+    public String getSignal() {
+        return mSignal;
+    }
+
+    public void setSignal(String mSignal) {
+        this.mSignal = mSignal;
+    }
+
+    public enum SignalType {
+        BINARY, INTEGER, STRING
     }
 
     @Dao

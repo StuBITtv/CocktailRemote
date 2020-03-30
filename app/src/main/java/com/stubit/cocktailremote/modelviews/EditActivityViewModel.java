@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
+import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.models.IngredientModel;
 
 import java.io.*;
@@ -50,6 +51,16 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
             mCocktailRepository.deleteCocktailImage(Uri.parse(filepath));
         }
 
+    }
+
+    public void setCocktailSignalType(CocktailModel.SignalType type) {
+        mCocktailSignalType.setValue(type);
+        mUnsavedChanges.setValue(true);
+    }
+
+    public void setCocktailSignal(String signal) {
+        mCocktailSignal.setValue(signal);
+        mUnsavedChanges.setValue(true);
     }
 
     public void addIngredient() {
@@ -143,6 +154,8 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
     public void saveCocktailAndIngredients() {
         mCocktail.setName(mCocktailName.getValue());
         mCocktail.setDescription(mCocktailDescription.getValue());
+        mCocktail.setSignalType(mCocktailSignalType.getValue());
+        mCocktail.setSignal(mCocktailSignal.getValue());
 
         Uri imageUri = mCocktailImageUri.getValue();
 

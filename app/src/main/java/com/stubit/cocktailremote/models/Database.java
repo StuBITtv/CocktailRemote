@@ -3,8 +3,10 @@ package com.stubit.cocktailremote.models;
 import android.content.Context;
 import androidx.room.Room;
 import androidx.room.RoomDatabase;
+import androidx.room.TypeConverters;
 
 @androidx.room.Database(entities = {CocktailModel.class, IngredientModel.class}, version = 1, exportSchema = false)
+@TypeConverters({SignalTypeTypeConverter.class})
 public abstract class Database extends RoomDatabase {
     protected Database() {}
 

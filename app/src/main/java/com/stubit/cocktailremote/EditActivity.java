@@ -1,16 +1,21 @@
 package com.stubit.cocktailremote;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
+import android.text.method.DigitsKeyListener;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.RadioButton;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -21,6 +26,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
+import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.modelviews.EditActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 import com.stubit.cocktailremote.views.CocktailImageView;
@@ -33,6 +39,8 @@ import java.util.ArrayList;
 import static com.stubit.cocktailremote.CocktailActivity.ID_EXTRA_KEY;
 
 public class EditActivity extends AppCompatActivity {
+    public static final String TAG = "EditActivity";
+
     private EditActivityViewModel mViewModel;
     private final static int PICK_IMAGE = 1;
     private final static int REQUEST_IMAGE_ACCESS = 2;
@@ -47,6 +55,7 @@ public class EditActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // region setup viewModel
         mSubmittedId = getIntent().getIntExtra(ID_EXTRA_KEY, 0);
 
         mViewModel = new ViewModelProvider(
@@ -57,7 +66,9 @@ public class EditActivity extends AppCompatActivity {
                         mSubmittedId
                 )
         ).get(EditActivityViewModel.class);
+        // end region
 
+        // region setup cocktail image
         final CocktailImageView cocktailImageView = findViewById(R.id.cocktail_image);
         final AppCompatActivity self = this;
 
@@ -79,7 +90,9 @@ public class EditActivity extends AppCompatActivity {
         });
 
         mViewModel.getCocktailImageUri().observe(this, uri -> cocktailImageView.setImage(getApplicationContext(), uri));
+        // endregion
 
+        // region setup name and description input
         setupTextInput(null, R.id.cocktail_name_input, new TextInputInterface() {
             @Override
             public String getText() {
@@ -103,7 +116,9 @@ public class EditActivity extends AppCompatActivity {
                 mViewModel.setCocktailDescription(text);
             }
         });
+        // endregion
 
+        // region setup ingredient list
         final IngredientListView ingredientListView = findViewById(R.id.ingredient_list);
         ingredientListView.setViewHolder(new IngredientListView.Adapter() {
             @Override
@@ -161,6 +176,14 @@ public class EditActivity extends AppCompatActivity {
             ingredientListView.updateIngredients(ingredients);
         });
 
+        findViewById(R.id.add_ingredient_button).setOnClickListener(v -> {
+            mViewModel.addIngredient();
+            ingredientListView.updateIngredients(mViewModel.getCocktailIngredientNames().getValue());
+            ingredientListView.getChildAt(ingredientListView.getChildCount() - 1).requestFocus();
+        });
+        // endregion
+
+        // region setup save button
         final FloatingActionButton fab = findViewById(R.id.fab);
 
         mViewModel.hasUnsavedChanges().observe(this, unsavedChanges -> {
@@ -171,13 +194,138 @@ public class EditActivity extends AppCompatActivity {
             }
         });
 
-        findViewById(R.id.add_ingredient_button).setOnClickListener(v -> {
-            mViewModel.addIngredient();
-            ingredientListView.updateIngredients(mViewModel.getCocktailIngredientNames().getValue());
-            ingredientListView.getChildAt(ingredientListView.getChildCount() - 1).requestFocus();
+        fab.setOnClickListener(view -> mViewModel.saveCocktailAndIngredients());
+        // endregion
+
+        // region setup signal input
+        final EditText signalInput = findViewById(R.id.signal_input);
+        final TextWatcher[] signalChangeWatcher = {null};
+
+        final RadioButton typeInputBinary = findViewById(R.id.type_input_binary);
+        typeInputBinary.setOnCheckedChangeListener((v, checked) -> {
+            if(checked) {
+                mViewModel.setCocktailSignalType(CocktailModel.SignalType.BINARY);
+
+                signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+                signalInput.setKeyListener(DigitsKeyListener.getInstance("01"));
+                signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+            }
         });
 
-        fab.setOnClickListener(view -> mViewModel.saveCocktailAndIngredients());
+        final RadioButton typeInputInteger = findViewById(R.id.type_input_number);
+        typeInputInteger.setOnCheckedChangeListener((v, checked) -> {
+            if(checked) {
+                mViewModel.setCocktailSignalType(CocktailModel.SignalType.INTEGER);
+
+                signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+                signalInput.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
+                signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+
+                // region setup number negative converter
+                signalChangeWatcher[0] = new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                    @SuppressLint("SetTextI18n")
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                        int cursorPosition = signalInput.getSelectionStart();
+
+                        if(s.length() > 1) {
+                            String numberEnding = s.toString().substring(1);
+
+                            if(numberEnding.contains("-")) {
+                                numberEnding = s.toString().substring(1).replace("-", "");
+                                char numberStart = s.toString().charAt(0);
+
+                                int positionOffset = 0;
+
+                                if(numberStart != '-') {
+                                    signalInput.setText("-" + numberStart + numberEnding);
+                                } else {
+                                    signalInput.setText(numberEnding);
+                                    positionOffset = 2;
+                                }
+
+                                int textLength = signalInput.getText().length();
+
+                                if(cursorPosition - positionOffset > textLength) {
+                                    positionOffset = cursorPosition - textLength;
+                                } else if (cursorPosition - positionOffset < 0) {
+                                    positionOffset = cursorPosition;
+                                }
+
+                                signalInput.setSelection(cursorPosition - positionOffset);
+                            }
+                        }
+
+                        setRadioButtonEnable(typeInputBinary, isBinary(signalInput.getText().toString()));
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {}
+                };
+                // endregion
+
+                signalInput.addTextChangedListener(signalChangeWatcher[0]);
+            }
+        });
+
+        final RadioButton typeInputString = findViewById(R.id.type_input_string);
+        typeInputString.setOnCheckedChangeListener((v, checked) -> {
+            if(checked) {
+                mViewModel.setCocktailSignalType(CocktailModel.SignalType.STRING);
+
+                signalInput.setInputType(InputType.TYPE_CLASS_TEXT);
+                signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+
+                signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
+
+                signalInput.addTextChangedListener(signalChangeWatcher[0]);
+            }
+        });
+
+        signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
+        signalInput.addTextChangedListener(signalChangeWatcher[0]);
+
+        signalInput.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                mViewModel.setCocktailSignal(s.toString());
+            }
+        });
+
+        mViewModel.getCocktailSignalType().observe(this, type -> {
+            switch (type) {
+                case BINARY:
+                    typeInputBinary.setChecked(true);
+                    break;
+
+                case INTEGER:
+                    typeInputInteger.setChecked(true);
+                    break;
+
+                default:
+                    typeInputString.setChecked(true);
+                    break;
+            }
+
+            mViewModel.getCocktailSignalType().removeObservers(this);
+        });
+
+        mViewModel.getCocktailSignal().observe(this, signal -> {
+            signalInput.setText(signal);
+
+            mViewModel.getCocktailSignal().removeObservers(this);
+        });
+
+        // endregion
 
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -317,5 +465,49 @@ public class EditActivity extends AppCompatActivity {
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
 
         startActivityForResult(chooserIntent, PICK_IMAGE);
+    }
+
+    private void setRadioButtonEnable(RadioButton radioButton, boolean enable) {
+            radioButton.setEnabled(enable);
+
+            if(enable) {
+                radioButton.setVisibility(View.VISIBLE);
+            } else {
+                radioButton.setVisibility(View.GONE);
+            }
+    }
+
+    private TextWatcher getStringTextWatcher(final RadioButton radioButtonInteger, final RadioButton radioButtonBinary) {
+        return new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                setRadioButtonEnable(radioButtonInteger, isInteger(s.toString()));
+                setRadioButtonEnable(radioButtonBinary, isBinary(s.toString()));
+            }
+        };
+    }
+
+    private boolean isBinary(String input) {
+        if(input == null || input.equals("")) {
+            return true;
+        }
+
+        return input.matches("[01]+");
+    }
+
+    private boolean isInteger(String input) {
+        if(input == null || input.equals("")) {
+            return true;
+        }
+
+        return input.matches("[-0123456789]+") && (input.length() <= 1 || !input.substring(1).contains("-"));
     }
 }

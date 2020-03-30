@@ -10,7 +10,7 @@
     <string name="cocktail_name">Cocktail name</string>
     <string name="unnamed_cocktail">Unnamed cocktail</string>
 
-    <string name="cocktail_description">Cocktail Description</string>
+    <string name="cocktail_description">Cocktail description</string>
     <string name="no_description">No description added yet.</string>
 
     <string name="ingredients">Ingredients</string>
@@ -22,4 +22,8 @@
     <string name="delete">Delete</string>
 
     <string name="permission_needed">Permission needed to pick cocktail image.</string>
+    <string name="bluetooth_signal">Bluetooth signal</string>
+    <string name="binary">Binary</string>
+    <string name="integer">Integer</string>
+    <string name="string">String</string>
 </resources>
