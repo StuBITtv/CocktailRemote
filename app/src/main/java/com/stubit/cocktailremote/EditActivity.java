@@ -25,6 +25,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.view.View;
+import com.stubit.cocktailremote.bluetooth.BluetoothManager;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.modelviews.EditActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
@@ -151,7 +152,7 @@ public class EditActivity extends AppCompatActivity {
                     if (newCocktailNames != null && newCocktailNames.size() != 0) {
                         int newFocusedPosition = position;
 
-                        if(position >= ingredientListView.getChildCount()) {
+                        if (position >= ingredientListView.getChildCount()) {
                             newFocusedPosition--;
                         }
 
@@ -220,7 +221,7 @@ public class EditActivity extends AppCompatActivity {
             mViewModel.getCocktailSignalType().removeObservers(this);
 
             typeInputBinary.setOnCheckedChangeListener((v, checked) -> {
-                if(checked) {
+                if (checked) {
                     mViewModel.setCocktailSignalType(CocktailModel.SignalType.BINARY);
 
                     signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -230,7 +231,7 @@ public class EditActivity extends AppCompatActivity {
             });
 
             typeInputInteger.setOnCheckedChangeListener((v, checked) -> {
-                if(checked) {
+                if (checked) {
                     mViewModel.setCocktailSignalType(CocktailModel.SignalType.INTEGER);
 
                     signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
@@ -240,23 +241,24 @@ public class EditActivity extends AppCompatActivity {
                     // region setup number negative converter
                     signalChangeWatcher[0] = new TextWatcher() {
                         @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                        }
 
                         @SuppressLint("SetTextI18n")
                         @Override
                         public void onTextChanged(CharSequence s, int start, int before, int count) {
                             int cursorPosition = signalInput.getSelectionStart();
 
-                            if(s.length() > 1) {
+                            if (s.length() > 1) {
                                 String numberEnding = s.toString().substring(1);
 
-                                if(numberEnding.contains("-")) {
+                                if (numberEnding.contains("-")) {
                                     numberEnding = s.toString().substring(1).replace("-", "");
                                     char numberStart = s.toString().charAt(0);
 
                                     int positionOffset = 0;
 
-                                    if(numberStart != '-') {
+                                    if (numberStart != '-') {
                                         signalInput.setText("-" + numberStart + numberEnding);
                                     } else {
                                         signalInput.setText(numberEnding);
@@ -265,7 +267,7 @@ public class EditActivity extends AppCompatActivity {
 
                                     int textLength = signalInput.getText().length();
 
-                                    if(cursorPosition - positionOffset > textLength) {
+                                    if (cursorPosition - positionOffset > textLength) {
                                         positionOffset = cursorPosition - textLength;
                                     } else if (cursorPosition - positionOffset < 0) {
                                         positionOffset = cursorPosition;
@@ -279,7 +281,8 @@ public class EditActivity extends AppCompatActivity {
                         }
 
                         @Override
-                        public void afterTextChanged(Editable s) {}
+                        public void afterTextChanged(Editable s) {
+                        }
                     };
                     // endregion
 
@@ -288,7 +291,7 @@ public class EditActivity extends AppCompatActivity {
             });
 
             typeInputString.setOnCheckedChangeListener((v, checked) -> {
-                if(checked) {
+                if (checked) {
                     mViewModel.setCocktailSignalType(CocktailModel.SignalType.STRING);
 
                     signalInput.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -307,15 +310,19 @@ public class EditActivity extends AppCompatActivity {
             setRadioButtonEnable(typeInputInteger, isInteger(signal));
             setRadioButtonEnable(typeInputBinary, isBinary(signal));
 
+            // TODO set right one
             signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
+
             signalInput.addTextChangedListener(signalChangeWatcher[0]);
 
             signalInput.addTextChangedListener(new TextWatcher() {
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                }
 
                 @Override
-                public void onTextChanged(CharSequence s, int start, int before, int count) {}
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                }
 
                 @Override
                 public void afterTextChanged(Editable s) {
@@ -347,6 +354,17 @@ public class EditActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onDestroy() {
+        BluetoothManager.getInstance().cleanup(this);
+
+        if (mToast != null) {
+            mToast.cancel();
+        }
+
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_edit, menu);
         return true;
@@ -354,7 +372,7 @@ public class EditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getTitle() != null && item.getTitle().equals(getString(R.string.delete))) {
+        if (item.getTitle() != null && item.getTitle().equals(getString(R.string.delete))) {
             mViewModel.deleteCocktail();
 
             startActivity(new Intent(this, MainActivity.class));
@@ -377,10 +395,12 @@ public class EditActivity extends AppCompatActivity {
 
         textInput.addTextChangedListener(new TextWatcher() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
 
             @Override
             public void afterTextChanged(Editable s) {
@@ -391,13 +411,14 @@ public class EditActivity extends AppCompatActivity {
 
     private interface TextInputInterface {
         String getText();
+
         void setText(String text);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if(requestCode == REQUEST_IMAGE_ACCESS && permissions[0].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            if(grantResults[0] != 0) {
+        if (requestCode == REQUEST_IMAGE_ACCESS && permissions[0].equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            if (grantResults[0] != 0) {
                 showToast(R.string.permission_needed);
             } else {
                 openGallery();
@@ -411,10 +432,10 @@ public class EditActivity extends AppCompatActivity {
 
         if (requestCode == PICK_IMAGE) {
             if (resultCode == RESULT_OK) {
-                if(data != null) {
+                if (data != null) {
                     Uri imageUri = data.getData();
 
-                    if(imageUri != null) {
+                    if (imageUri != null) {
                         try {
                             mViewModel.setCocktailImageUri(this, imageUri);
                         } catch (IOException e) {
@@ -428,7 +449,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private void showToast(int StringId) {
-        if(mToast != null) {
+        if (mToast != null) {
             mToast.cancel();
         }
 
@@ -439,10 +460,10 @@ public class EditActivity extends AppCompatActivity {
     private void exitEdit() {
         mViewModel.cleanUp();
 
-        if(mViewModel.getCocktailId() == null) {
+        if (mViewModel.getCocktailId() == null) {
             startActivity(new Intent(this, MainActivity.class));
         } else {
-            if(mSubmittedId != 0) {
+            if (mSubmittedId != 0) {
                 Intent showIntent = new Intent(this, CocktailActivity.class);
 
                 showIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
@@ -463,19 +484,19 @@ public class EditActivity extends AppCompatActivity {
         pickIntent.setDataAndType(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "image/*");
 
         Intent chooserIntent = Intent.createChooser(getIntent, "Select Image");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[] {pickIntent});
+        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, new Intent[]{pickIntent});
 
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
 
     private void setRadioButtonEnable(RadioButton radioButton, boolean enable) {
-            radioButton.setEnabled(enable);
+        radioButton.setEnabled(enable);
 
-            if(enable) {
-                radioButton.setVisibility(View.VISIBLE);
-            } else {
-                radioButton.setVisibility(View.GONE);
-            }
+        if (enable) {
+            radioButton.setVisibility(View.VISIBLE);
+        } else {
+            radioButton.setVisibility(View.GONE);
+        }
     }
 
     private TextWatcher getStringTextWatcher(final RadioButton radioButtonInteger, final RadioButton radioButtonBinary) {
@@ -497,7 +518,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private boolean isBinary(String input) {
-        if(input == null || input.equals("")) {
+        if (input == null || input.equals("")) {
             return true;
         }
 
@@ -505,7 +526,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     private boolean isInteger(String input) {
-        if(input == null || input.equals("")) {
+        if (input == null || input.equals("")) {
             return true;
         }
 

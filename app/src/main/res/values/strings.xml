@@ -22,8 +22,14 @@
     <string name="delete">Delete</string>
 
     <string name="permission_needed">Permission needed to pick cocktail image.</string>
+
     <string name="bluetooth_signal">Bluetooth signal</string>
     <string name="binary">Binary</string>
     <string name="integer">Integer</string>
     <string name="string">String</string>
+    <string name="no_bluetooth_signal">No bluetooth signal added yet.</string>
+
+    <string name="bluetooth_connection_failure">Unable to connect to bluetooth.</string>
+    <string name="bluetooth_close_failure">Unable to close bluetooth connection.</string>
+    <string name="title_activity_bluetooth_device_picker">Bluetooth Device Picker</string>
 </resources>

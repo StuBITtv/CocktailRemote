@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.stubit.cocktailremote.adapters.CocktailAdapter;
+import com.stubit.cocktailremote.bluetooth.BluetoothManager;
 import com.stubit.cocktailremote.modelviews.ItemListMainViewModel;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import androidx.appcompat.app.AppCompatActivity;
@@ -34,5 +35,11 @@ public class MainActivity extends AppCompatActivity {
                 new CocktailAdapter(this, viewModel)
         );
         cocktailList.setLayoutManager(new LinearLayoutManager(this));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        BluetoothManager.getInstance().cleanup(this);
     }
 }

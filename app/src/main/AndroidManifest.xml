@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        package="com.stubit.cocktailremote"
->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          xmlns:tools="http://schemas.android.com/tools"
+          package="com.stubit.cocktailremote">
+
     <uses-permission
             android:name="android.permission.READ_EXTERNAL_STORAGE"
             android:required="false"
     />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
 
     <application
             android:allowBackup="true"
@@ -17,38 +18,46 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme"
-            tools:ignore="GoogleAppIndexingWarning"
-    >
+            tools:ignore="GoogleAppIndexingWarning">
+        <activity
+                android:name=".BluetoothDevicePickerActivity"
+                android:label="@string/title_activity_bluetooth_device_picker"
+                android:parentActivityName=".CocktailActivity"
+                android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.stubit.cocktailremote.CocktailActivity"/>
+        </activity>
         <activity
                 android:name=".EditActivity"
                 android:label="@string/title_activity_edit"
-                android:theme="@style/AppTheme.NoActionBar"
-        >
+                android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value="com.stubit.cocktailremote.CocktailActivity"
-            />
+                    android:value="com.stubit.cocktailremote.CocktailActivity"/>
         </activity>
         <activity
                 android:name=".CocktailActivity"
                 android:label="@string/title_activity_cocktail"
                 android:parentActivityName=".MainActivity"
-                android:theme="@style/AppTheme.NoActionBar"
-        >
+                android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                     android:name="android.support.PARENT_ACTIVITY"
-                    android:value="com.stubit.cocktailremote.MainActivity"
-            />
+                    android:value="com.stubit.cocktailremote.MainActivity"/>
         </activity>
         <activity
                 android:name=".MainActivity"
                 android:label="@string/app_name"
-                android:theme="@style/AppTheme.NoActionBar"
-        >
+                android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <activity
+                android:name=".bluetooth.BluetoothManager"
+                android:value="com.stubit.cocktailremote.BluetoothManager"/>
     </application>
+
 </manifest>

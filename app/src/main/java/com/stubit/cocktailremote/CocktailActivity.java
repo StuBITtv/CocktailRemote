@@ -2,24 +2,36 @@ package com.stubit.cocktailremote;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.stubit.cocktailremote.bluetooth.BluetoothManager;
+import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.modelviews.CocktailActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
 import com.stubit.cocktailremote.views.CocktailImageView;
 import com.stubit.cocktailremote.views.IngredientListView;
 import com.stubit.cocktailremote.views.TextView;
 
-public class CocktailActivity extends AppCompatActivity {
+import static com.stubit.cocktailremote.BluetoothDevicePickerActivity.BLUETOOTH_DEVICE;
 
+public class CocktailActivity extends AppCompatActivity {
+    public static final int BLUETOOTH_DEVICE_REQUEST = 1;
     public static final String ID_EXTRA_KEY = "cocktailId";
-    CocktailActivityViewModel viewModel;
+    private static final String TAG = "CocktailActivity";
+
+    private CocktailActivityViewModel viewModel;
+
+    private Toast mToast;
+    private String mBluetoothDeviceAddress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +40,7 @@ public class CocktailActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // region setup viewModel
         viewModel = new ViewModelProvider(
                 this,
                 new ViewModelFactory(
@@ -36,7 +49,9 @@ public class CocktailActivity extends AppCompatActivity {
                         getIntent().getIntExtra(ID_EXTRA_KEY, 0)
                 )
         ).get(CocktailActivityViewModel.class);
+        // endregion
 
+        // region setup name, description and image
         viewModel.getCocktailName().observe(this, cocktailName -> {
             TextView cocktailNameView = findViewById(R.id.cocktail_name);
             cocktailNameView.setText(cocktailName, R.string.unnamed_cocktail);
@@ -50,7 +65,9 @@ public class CocktailActivity extends AppCompatActivity {
         viewModel.getCocktailImageUri().observe(this, uri -> (
                 (CocktailImageView) findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), uri)
         );
+        // endregion
 
+        // region setup ingredient list
         final IngredientListView ingredientListView = findViewById(R.id.ingredient_list);
         ingredientListView.setViewHolder(new IngredientListView.Adapter() {
             @Override
@@ -70,14 +87,26 @@ public class CocktailActivity extends AppCompatActivity {
         });
 
         viewModel.getCocktailIngredientNames().observe(this, ingredientListView::updateIngredients);
+        // endregion
+
+        // region setup bluetooth action
+        mBluetoothDeviceAddress = BluetoothManager.getInstance().getConnectedDeviceAddress();
 
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view -> {
-            // TODO send bluetooth
-        });
+        fab.setOnClickListener(view ->
+                new Thread(this::sendBluetoothSignal).start()
+        );
+        // endregion
 
         //noinspection ConstantConditions
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        BluetoothManager.getInstance().cleanup(this);
     }
 
     @Override
@@ -99,5 +128,109 @@ public class CocktailActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void createToast(int ResId) {
+        runOnUiThread(() -> {
+            if (mToast != null) {
+                mToast.cancel();
+            }
+
+            mToast = Toast.makeText(this, ResId, Toast.LENGTH_SHORT);
+            mToast.show();
+        });
+
+
+    }
+
+    private void sendBluetoothSignal() {
+        if (mBluetoothDeviceAddress != null && !mBluetoothDeviceAddress.equals("")) {
+            CocktailModel.SignalType signalType = viewModel.getCocktailSignalType().getValue();
+            String signal = viewModel.getCocktailSignal().getValue();
+
+            if (signalType != null && signal != null && !signal.equals("")) {
+                switch (signalType) {
+                    case BINARY:
+                        // convert string into actual bytes
+                        byte[] bytes;
+                        if (signal.length() % 8 != 0) {
+                            bytes = new byte[signal.length() / 8 + 1];
+                        } else {
+                            bytes = new byte[signal.length() / 8];
+                        }
+
+                        for (int bit = 0; bit < signal.length(); ++bit) {
+                            if (signal.charAt(bit) == '1') {
+                                bytes[bit / 8] |= (1 << (7 - bit % 8));
+                            }
+                        }
+
+                        Log.d(TAG, "Signal consist out of those bytes: ");
+
+                        for (byte singleByte : bytes) {
+                            StringBuilder value = new StringBuilder();
+
+                            for (int i = 7; i > -1; --i) {
+                                if ((singleByte & (1 << i)) != 0) {
+                                    value.append("1");
+                                } else {
+                                    value.append("0");
+                                }
+                            }
+
+                            Log.d(TAG, value.toString());
+                        }
+
+                        BluetoothManager.getInstance().send(
+                                this,
+                                mBluetoothDeviceAddress,
+                                bytes,
+                                this::unableToConnect
+                        );
+                        break;
+
+                    case INTEGER:
+                        BluetoothManager.getInstance().send(
+                                this,
+                                mBluetoothDeviceAddress,
+                                Integer.valueOf(signal),
+                                this::unableToConnect
+                        );
+                        break;
+
+                    default:
+                        BluetoothManager.getInstance().send(
+                                this,
+                                mBluetoothDeviceAddress,
+                                signal,
+                                this::unableToConnect
+                        );
+                        break;
+                }
+            } else {
+                createToast(R.string.no_bluetooth_signal);
+            }
+        } else {
+            // TODO setup intent
+            startActivityForResult(new Intent(this, BluetoothDevicePickerActivity.class), BLUETOOTH_DEVICE_REQUEST);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == BLUETOOTH_DEVICE_REQUEST && data != null && resultCode == RESULT_OK) {
+            mBluetoothDeviceAddress = data.getStringExtra(BLUETOOTH_DEVICE);
+            new Thread(this::sendBluetoothSignal).start();
+        }
+
+    }
+
+    public void unableToConnect() {
+        mBluetoothDeviceAddress = null;
+
+        createToast(R.string.bluetooth_connection_failure);
+        startActivityForResult(new Intent(this, BluetoothDevicePickerActivity.class), BLUETOOTH_DEVICE_REQUEST);
     }
 }
