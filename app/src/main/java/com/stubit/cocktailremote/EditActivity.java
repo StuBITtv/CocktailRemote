@@ -207,14 +207,19 @@ public class EditActivity extends AppCompatActivity {
             switch (type) {
                 case BINARY:
                     typeInputBinary.setChecked(true);
+                    setupBinaryInput(signalInput);
                     break;
 
                 case INTEGER:
                     typeInputInteger.setChecked(true);
+                    signalChangeWatcher[0] = setupIntegerInput(signalInput, typeInputBinary);
                     break;
 
                 default:
                     typeInputString.setChecked(true);
+
+                    signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
+                    signalInput.addTextChangedListener(signalChangeWatcher[0]);
                     break;
             }
 
@@ -223,70 +228,18 @@ public class EditActivity extends AppCompatActivity {
             typeInputBinary.setOnCheckedChangeListener((v, checked) -> {
                 if (checked) {
                     mViewModel.setCocktailSignalType(CocktailModel.SignalType.BINARY);
-
-                    signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
-                    signalInput.setKeyListener(DigitsKeyListener.getInstance("01"));
                     signalInput.removeTextChangedListener(signalChangeWatcher[0]);
+
+                    setupBinaryInput(signalInput);
                 }
             });
 
             typeInputInteger.setOnCheckedChangeListener((v, checked) -> {
                 if (checked) {
                     mViewModel.setCocktailSignalType(CocktailModel.SignalType.INTEGER);
-
-                    signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
-                    signalInput.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
                     signalInput.removeTextChangedListener(signalChangeWatcher[0]);
 
-                    // region setup number negative converter
-                    signalChangeWatcher[0] = new TextWatcher() {
-                        @Override
-                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                        }
-
-                        @SuppressLint("SetTextI18n")
-                        @Override
-                        public void onTextChanged(CharSequence s, int start, int before, int count) {
-                            int cursorPosition = signalInput.getSelectionStart();
-
-                            if (s.length() > 1) {
-                                String numberEnding = s.toString().substring(1);
-
-                                if (numberEnding.contains("-")) {
-                                    numberEnding = s.toString().substring(1).replace("-", "");
-                                    char numberStart = s.toString().charAt(0);
-
-                                    int positionOffset = 0;
-
-                                    if (numberStart != '-') {
-                                        signalInput.setText("-" + numberStart + numberEnding);
-                                    } else {
-                                        signalInput.setText(numberEnding);
-                                        positionOffset = 2;
-                                    }
-
-                                    int textLength = signalInput.getText().length();
-
-                                    if (cursorPosition - positionOffset > textLength) {
-                                        positionOffset = cursorPosition - textLength;
-                                    } else if (cursorPosition - positionOffset < 0) {
-                                        positionOffset = cursorPosition;
-                                    }
-
-                                    signalInput.setSelection(cursorPosition - positionOffset);
-                                }
-                            }
-
-                            setRadioButtonEnable(typeInputBinary, isBinary(signalInput.getText().toString()));
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable s) {
-                        }
-                    };
-                    // endregion
-
-                    signalInput.addTextChangedListener(signalChangeWatcher[0]);
+                    signalChangeWatcher[0] = setupIntegerInput(signalInput, typeInputBinary);
                 }
             });
 
@@ -309,11 +262,6 @@ public class EditActivity extends AppCompatActivity {
 
             setRadioButtonEnable(typeInputInteger, isInteger(signal));
             setRadioButtonEnable(typeInputBinary, isBinary(signal));
-
-            // TODO set right one
-            signalChangeWatcher[0] = getStringTextWatcher(typeInputInteger, typeInputBinary);
-
-            signalInput.addTextChangedListener(signalChangeWatcher[0]);
 
             signalInput.addTextChangedListener(new TextWatcher() {
                 @Override
@@ -371,7 +319,7 @@ public class EditActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(@NotNull MenuItem item) {
         if (item.getTitle() != null && item.getTitle().equals(getString(R.string.delete))) {
             mViewModel.deleteCocktail();
 
@@ -489,7 +437,7 @@ public class EditActivity extends AppCompatActivity {
         startActivityForResult(chooserIntent, PICK_IMAGE);
     }
 
-    private void setRadioButtonEnable(RadioButton radioButton, boolean enable) {
+    private void setRadioButtonEnable(@NotNull RadioButton radioButton, boolean enable) {
         radioButton.setEnabled(enable);
 
         if (enable) {
@@ -499,6 +447,7 @@ public class EditActivity extends AppCompatActivity {
         }
     }
 
+    @NotNull
     private TextWatcher getStringTextWatcher(final RadioButton radioButtonInteger, final RadioButton radioButtonBinary) {
         return new TextWatcher() {
             @Override
@@ -515,6 +464,69 @@ public class EditActivity extends AppCompatActivity {
                 setRadioButtonEnable(radioButtonBinary, isBinary(s.toString()));
             }
         };
+    }
+
+    @NotNull
+    private TextWatcher setupIntegerInput(@NotNull final EditText signalInput, final RadioButton radioButtonBinary) {
+        signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        signalInput.setKeyListener(DigitsKeyListener.getInstance("-0123456789"));
+
+        // region setup number negative converter
+        TextWatcher textWatcher = new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @SuppressLint("SetTextI18n")
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                int cursorPosition = signalInput.getSelectionStart();
+
+                if (s.length() > 1) {
+                    String numberEnding = s.toString().substring(1);
+
+                    if (numberEnding.contains("-")) {
+                        numberEnding = s.toString().substring(1).replace("-", "");
+                        char numberStart = s.toString().charAt(0);
+
+                        int positionOffset = 0;
+
+                        if (numberStart != '-') {
+                            signalInput.setText("-" + numberStart + numberEnding);
+                        } else {
+                            signalInput.setText(numberEnding);
+                            positionOffset = 2;
+                        }
+
+                        int textLength = signalInput.getText().length();
+
+                        if (cursorPosition - positionOffset > textLength) {
+                            positionOffset = cursorPosition - textLength;
+                        } else if (cursorPosition - positionOffset < 0) {
+                            positionOffset = cursorPosition;
+                        }
+
+                        signalInput.setSelection(cursorPosition - positionOffset);
+                    }
+                }
+
+                setRadioButtonEnable(radioButtonBinary, isBinary(signalInput.getText().toString()));
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        };
+        // endregion
+
+        signalInput.addTextChangedListener(textWatcher);
+
+        return textWatcher;
+    }
+
+    private void setupBinaryInput(@NotNull final EditText signalInput) {
+        signalInput.setInputType(InputType.TYPE_CLASS_NUMBER);
+        signalInput.setKeyListener(DigitsKeyListener.getInstance("01"));
     }
 
     private boolean isBinary(String input) {
