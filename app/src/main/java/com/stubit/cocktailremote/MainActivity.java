@@ -1,5 +1,6 @@
 package com.stubit.cocktailremote;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
@@ -19,6 +20,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Dialog mDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
             if(PasswordValidation.passwordIsNotSet(this) || PasswordValidation.editIsUnlocked(this)) {
                 startActivity(new Intent(getApplicationContext(), EditActivity.class));
             } else {
-                PasswordValidation.validatePassword(
+                pushDialog(PasswordValidation.validatePassword(
                         this,
                         () -> startActivity(new Intent(getApplicationContext(), EditActivity.class))
-                );
+                ));
             }
         });
 
@@ -53,6 +56,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        pushDialog(null);
         BluetoothManager.getInstance().cleanup(this);
     }
 
@@ -69,12 +74,20 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else {
                 //noinspection CodeBlock2Expr
-                PasswordValidation.validatePassword(this, () -> {
+                pushDialog(PasswordValidation.validatePassword(this, () -> {
                     startActivity(new Intent(this, SettingsActivity.class));
-                });
+                }));
             }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void pushDialog(Dialog dialog) {
+        if(mDialog != null) {
+            mDialog.dismiss();
+        }
+
+        mDialog = dialog;
     }
 }

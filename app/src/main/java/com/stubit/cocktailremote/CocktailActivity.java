@@ -1,5 +1,6 @@
 package com.stubit.cocktailremote;
 
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -36,6 +37,7 @@ public class CocktailActivity extends AppCompatActivity {
     private String mBluetoothDeviceAddress;
 
     private Boolean mPasswordProtectedCocktail;
+    private Dialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,7 +106,7 @@ public class CocktailActivity extends AppCompatActivity {
                 if (PasswordValidation.passwordIsNotSet(this) || !passwordProtected) {
                     new Thread(this::sendBluetoothSignal).start();
                 } else {
-                    PasswordValidation.validatePassword(this, () -> new Thread(this::sendBluetoothSignal).start());
+                    pushDialog(PasswordValidation.validatePassword(this, () -> new Thread(this::sendBluetoothSignal).start()));
                 }
             });
         });
@@ -119,6 +121,7 @@ public class CocktailActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
+        pushDialog(null);
         BluetoothManager.getInstance().cleanup(this);
     }
 
@@ -150,11 +153,19 @@ public class CocktailActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void pushDialog(Dialog dialog) {
+        if(mDialog != null) {
+            mDialog.dismiss();
+        }
+
+        mDialog = dialog;
+    }
+
     private void authoriseEdit() {
         if (PasswordValidation.passwordIsNotSet(this) || (PasswordValidation.editIsUnlocked(this)) && !mPasswordProtectedCocktail) {
             startEditActivity();
         } else {
-            PasswordValidation.validatePassword(this, this::startEditActivity);
+            pushDialog(PasswordValidation.validatePassword(this, this::startEditActivity));
         }
     }
 

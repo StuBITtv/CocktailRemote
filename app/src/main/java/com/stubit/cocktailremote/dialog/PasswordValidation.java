@@ -2,6 +2,7 @@ package com.stubit.cocktailremote.dialog;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -11,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.stubit.cocktailremote.R;
 
 public class PasswordValidation {
-    public static void validatePassword(AppCompatActivity app, Runnable onValidation) {
+    public static Dialog validatePassword(AppCompatActivity app, Runnable onValidation) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(app, R.style.AppTheme_Dialog);
 
         @SuppressLint("InflateParams")
@@ -41,6 +42,8 @@ public class PasswordValidation {
                 invalidPasswordNotification.setVisibility(View.VISIBLE);
             }
         });
+
+        return dialog;
     }
 
     public static boolean passwordIsNotSet(Context c) {
