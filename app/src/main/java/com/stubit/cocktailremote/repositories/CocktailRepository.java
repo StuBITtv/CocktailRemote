@@ -76,7 +76,6 @@ public class CocktailRepository {
         return mIngredients.get(cocktailId);
     }
 
-
     public void addCocktail(final CocktailModel cocktailModel) {
         new Thread(() -> {
             mLatestCocktailId.postValue(mCocktailAccess.addModel(cocktailModel).intValue());

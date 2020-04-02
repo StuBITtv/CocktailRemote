@@ -28,7 +28,7 @@ public class BluetoothManager {
 
     private String mUsedBluetoothAddress;
 
-    private BluetoothManager() {
+    public BluetoothManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         if (mBluetoothAdapter == null) {

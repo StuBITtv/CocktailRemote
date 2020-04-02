@@ -1,7 +1,9 @@
 package com.stubit.cocktailremote;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,6 +16,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.stubit.cocktailremote.bluetooth.BluetoothManager;
+import com.stubit.cocktailremote.dialog.PasswordValidation;
 import com.stubit.cocktailremote.models.CocktailModel;
 import com.stubit.cocktailremote.modelviews.CocktailActivityViewModel;
 import com.stubit.cocktailremote.modelviews.ViewModelFactory;
@@ -119,15 +122,24 @@ public class CocktailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
-            Intent editIntent = new Intent(this, EditActivity.class);
+            if(PasswordValidation.passwordIsNotSet(this) || PasswordValidation.editIsUnlocked(this)) {
+                startEditActivity();
+            } else {
+                PasswordValidation.validatePassword(this, this::startEditActivity);
+            }
 
-            editIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-            editIntent.putExtra(ID_EXTRA_KEY, viewModel.getCocktailId());
-
-            startActivity(editIntent);
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startEditActivity() {
+        Intent editIntent = new Intent(this, EditActivity.class);
+
+        editIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+        editIntent.putExtra(ID_EXTRA_KEY, viewModel.getCocktailId());
+
+        startActivity(editIntent);
     }
 
     private void createToast(int ResId) {
@@ -144,6 +156,11 @@ public class CocktailActivity extends AppCompatActivity {
     }
 
     private void sendBluetoothSignal() {
+        // TODO check password and if cocktail is password protected
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String password = preferences.getString("password", null);
+
+
         if (mBluetoothDeviceAddress != null && !mBluetoothDeviceAddress.equals("")) {
             CocktailModel.SignalType signalType = viewModel.getCocktailSignalType().getValue();
             String signal = viewModel.getCocktailSignal().getValue();
