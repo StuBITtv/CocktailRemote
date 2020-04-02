@@ -50,6 +50,7 @@ proguard/
 
 # Android Studio captures folder
 captures/
+/release
 
 # IntelliJ
 .idea/workspace.xml
