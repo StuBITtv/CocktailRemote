@@ -5,8 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.text.InputType;
-import android.text.method.PasswordTransformationMethod;
 import android.view.View;
 import android.widget.EditText;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,9 +17,6 @@ public class PasswordValidation {
         @SuppressLint("InflateParams")
         View inputLayout = app.getLayoutInflater().inflate(R.layout.dialog_password_validation, null);
         EditText passwordInput = inputLayout.findViewById(R.id.password_input);
-
-        passwordInput.setInputType(InputType.TYPE_TEXT_VARIATION_PASSWORD);
-        passwordInput.setTransformationMethod(PasswordTransformationMethod.getInstance());
 
         String password = getPassword(app);
 
