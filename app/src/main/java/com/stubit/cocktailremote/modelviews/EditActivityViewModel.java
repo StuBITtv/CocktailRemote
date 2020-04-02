@@ -18,8 +18,8 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
     private final MutableLiveData<Boolean> mUnsavedChanges = new MutableLiveData<>(false);
 
     private List<IngredientModel> mIngredientModels = new ArrayList<>();
-    private List<IngredientModel> mDeleteIngredients = new ArrayList<>();
-    private SparseArray<IngredientModel> mUpdatedIngredients = new SparseArray<>();
+    private final List<IngredientModel> mDeleteIngredients = new ArrayList<>();
+    private final SparseArray<IngredientModel> mUpdatedIngredients = new SparseArray<>();
 
     public EditActivityViewModel(Context c, LifecycleOwner owner, Integer cocktailId) {
         super(c, owner, cocktailId);

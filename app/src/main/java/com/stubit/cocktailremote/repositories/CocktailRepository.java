@@ -28,7 +28,7 @@ public class CocktailRepository {
     private static IngredientModel.Access mIngredientAccess;
 
     private MutableLiveData<SparseArray<CocktailModel>> mCocktails;
-    private SparseArray<MutableLiveData<List<IngredientModel>>> mIngredients = new SparseArray<>();
+    private final SparseArray<MutableLiveData<List<IngredientModel>>> mIngredients = new SparseArray<>();
     private final MutableLiveData<Integer> mLatestCocktailId = new MutableLiveData<>(null);
 
     public static CocktailRepository getRepository(Context c) {

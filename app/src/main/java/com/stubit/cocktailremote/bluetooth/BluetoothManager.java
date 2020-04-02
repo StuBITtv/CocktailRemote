@@ -22,7 +22,7 @@ public class BluetoothManager {
 
     static private BluetoothManager mInstance;
 
-    private BluetoothAdapter mBluetoothAdapter;
+    private final BluetoothAdapter mBluetoothAdapter;
     private BroadcastReceiver mBluetoothEnabledReceiver;
     private BluetoothSocket mBluetoothSocket;
 
