@@ -5,7 +5,9 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".BluetoothDevicePickerActivity" android:background="@color/colorPrimaryLight">
+        android:background="@color/colorPrimaryLight"
+        tools:context=".BluetoothDevicePickerActivity"
+>
 
     <com.google.android.material.appbar.AppBarLayout
             android:layout_height="wrap_content"
@@ -13,11 +15,12 @@
             android:theme="@style/AppTheme.AppBarOverlay">
 
         <androidx.appcompat.widget.Toolbar
+                app:popupTheme="@style/AppTheme.PopupOverlay"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 android:background="?attr/colorPrimary"
-                app:popupTheme="@style/AppTheme.PopupOverlay"/>
+        />
 
     </com.google.android.material.appbar.AppBarLayout>
 

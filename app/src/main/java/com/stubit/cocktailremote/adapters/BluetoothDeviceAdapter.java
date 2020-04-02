@@ -46,9 +46,7 @@ public class BluetoothDeviceAdapter extends RecyclerView.Adapter<BluetoothDevice
         holder.mNameView.setText(mDevices.get(position).getName());
         holder.mAddressView.setText(mDevices.get(position).getAddress());
 
-        holder.mHolder.setOnClickListener(v -> {
-            mOnSelectListener.run(mDevices.get(position));
-        });
+        holder.mHolder.setOnClickListener(v -> mOnSelectListener.run(mDevices.get(position)));
     }
 
     @Override

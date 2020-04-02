@@ -18,6 +18,7 @@ public class CocktailActivityViewModel extends ViewModel {
     protected final MutableLiveData<ArrayList<String>> mCocktailIngredientNames = new MutableLiveData<>();
     protected final MutableLiveData<CocktailModel.SignalType> mCocktailSignalType = new MutableLiveData<>();
     protected final MutableLiveData<String> mCocktailSignal = new MutableLiveData<>();
+    protected final MutableLiveData<Boolean> mPasswordProtected = new MutableLiveData<>();
 
     protected Integer mCocktailId;
     protected final CocktailRepository mCocktailRepository;
@@ -59,6 +60,10 @@ public class CocktailActivityViewModel extends ViewModel {
 
     public LiveData<String> getCocktailSignal() {
         return mCocktailSignal;
+    }
+
+    public LiveData<Boolean> getPasswordProtectionStatus() {
+        return mPasswordProtected;
     }
 
     protected void loadCocktailInfo() {
@@ -103,6 +108,7 @@ public class CocktailActivityViewModel extends ViewModel {
             );
 
             mCocktailSignal.setValue(mCocktail.getSignal());
+            mPasswordProtected.setValue(mCocktail.getPasswordProtectionStatus());
         }
     }
 }

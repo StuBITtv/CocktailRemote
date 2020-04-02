@@ -13,9 +13,7 @@ import android.text.method.DigitsKeyListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.RadioButton;
-import android.widget.Toast;
+import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
@@ -281,6 +279,20 @@ public class EditActivity extends AppCompatActivity {
             mViewModel.getCocktailSignal().removeObservers(this);
         });
 
+        // endregion
+
+        // region setup password protection option
+        mViewModel.getPasswordProtectionStatus().observe(this, passwordProtected -> {
+            Switch switchView = findViewById(R.id.password_protection);
+
+            if(passwordProtected != null) {
+                switchView.setChecked(passwordProtected);
+            }
+
+            switchView.setOnCheckedChangeListener((buttonView, isChecked) -> mViewModel.setPasswordProtection(isChecked));
+
+            mViewModel.getPasswordProtectionStatus().removeObservers(this);
+        });
         // endregion
 
         //noinspection ConstantConditions

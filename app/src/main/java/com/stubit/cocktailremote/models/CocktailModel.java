@@ -26,6 +26,9 @@ public class CocktailModel {
     @ColumnInfo(name = "signal")
     protected String mSignal;
 
+    @ColumnInfo(name = "password_protected")
+    protected Boolean mPasswordProtected;
+
     public CocktailModel() {}
 
     public Integer getId() {
@@ -70,6 +73,14 @@ public class CocktailModel {
 
     public void setSignal(String mSignal) {
         this.mSignal = mSignal;
+    }
+
+    public Boolean getPasswordProtectionStatus() {
+        return mPasswordProtected;
+    }
+
+    public void setPasswordProtected(Boolean mPasswordProtected) {
+        this.mPasswordProtected = mPasswordProtected;
     }
 
     public enum SignalType {

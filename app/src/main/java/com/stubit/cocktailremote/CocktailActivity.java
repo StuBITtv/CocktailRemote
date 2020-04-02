@@ -1,9 +1,7 @@
 package com.stubit.cocktailremote;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.stubit.cocktailremote.bluetooth.BluetoothManager;
@@ -31,10 +30,12 @@ public class CocktailActivity extends AppCompatActivity {
     public static final String ID_EXTRA_KEY = "cocktailId";
     private static final String TAG = "CocktailActivity";
 
-    private CocktailActivityViewModel viewModel;
+    private CocktailActivityViewModel mViewModel;
 
     private Toast mToast;
     private String mBluetoothDeviceAddress;
+
+    private Boolean mPasswordProtectedCocktail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class CocktailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         // region setup viewModel
-        viewModel = new ViewModelProvider(
+        mViewModel = new ViewModelProvider(
                 this,
                 new ViewModelFactory(
                         getApplicationContext(),
@@ -55,17 +56,17 @@ public class CocktailActivity extends AppCompatActivity {
         // endregion
 
         // region setup name, description and image
-        viewModel.getCocktailName().observe(this, cocktailName -> {
+        mViewModel.getCocktailName().observe(this, cocktailName -> {
             TextView cocktailNameView = findViewById(R.id.cocktail_name);
             cocktailNameView.setText(cocktailName, R.string.unnamed_cocktail);
         });
 
-        viewModel.getCocktailDescription().observe(this, cocktailDescription -> {
+        mViewModel.getCocktailDescription().observe(this, cocktailDescription -> {
             TextView cocktailDescriptionView = findViewById(R.id.cocktail_description);
             cocktailDescriptionView.setText(cocktailDescription, R.string.no_description);
         });
 
-        viewModel.getCocktailImageUri().observe(this, uri -> (
+        mViewModel.getCocktailImageUri().observe(this, uri -> (
                 (CocktailImageView) findViewById(R.id.cocktail_image)).setImage(getApplicationContext(), uri)
         );
         // endregion
@@ -89,16 +90,25 @@ public class CocktailActivity extends AppCompatActivity {
             }
         });
 
-        viewModel.getCocktailIngredientNames().observe(this, ingredientListView::updateIngredients);
+        mViewModel.getCocktailIngredientNames().observe(this, ingredientListView::updateIngredients);
         // endregion
 
         // region setup bluetooth action
         mBluetoothDeviceAddress = BluetoothManager.getInstance().getConnectedDeviceAddress();
 
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(view ->
-                new Thread(this::sendBluetoothSignal).start()
-        );
+        mViewModel.getPasswordProtectionStatus().observe(this, passwordProtected -> {
+            FloatingActionButton fab = findViewById(R.id.fab);
+            mPasswordProtectedCocktail = passwordProtected;
+
+            fab.setOnClickListener(view -> {
+                if (PasswordValidation.passwordIsNotSet(this) || !passwordProtected) {
+                    new Thread(this::sendBluetoothSignal).start();
+                } else {
+                    PasswordValidation.validatePassword(this, () -> new Thread(this::sendBluetoothSignal).start());
+                }
+            });
+        });
+
         // endregion
 
         //noinspection ConstantConditions
@@ -122,22 +132,37 @@ public class CocktailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
-            if(PasswordValidation.passwordIsNotSet(this) || PasswordValidation.editIsUnlocked(this)) {
-                startEditActivity();
-            } else {
-                PasswordValidation.validatePassword(this, this::startEditActivity);
-            }
+            if(mPasswordProtectedCocktail == null) {
+                mViewModel.getPasswordProtectionStatus().observe(this, new Observer<Boolean>() {
+                    @Override
+                    public void onChanged(Boolean passwordProtected) {
+                        mViewModel.getPasswordProtectionStatus().removeObserver(this);
+                        mPasswordProtectedCocktail = passwordProtected;
 
+                        authoriseEdit();
+                    }
+                });
+            } else {
+                authoriseEdit();
+            }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void authoriseEdit() {
+        if (PasswordValidation.passwordIsNotSet(this) || (PasswordValidation.editIsUnlocked(this)) && !mPasswordProtectedCocktail) {
+            startEditActivity();
+        } else {
+            PasswordValidation.validatePassword(this, this::startEditActivity);
+        }
     }
 
     private void startEditActivity() {
         Intent editIntent = new Intent(this, EditActivity.class);
 
         editIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-        editIntent.putExtra(ID_EXTRA_KEY, viewModel.getCocktailId());
+        editIntent.putExtra(ID_EXTRA_KEY, mViewModel.getCocktailId());
 
         startActivity(editIntent);
     }
@@ -156,14 +181,9 @@ public class CocktailActivity extends AppCompatActivity {
     }
 
     private void sendBluetoothSignal() {
-        // TODO check password and if cocktail is password protected
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        String password = preferences.getString("password", null);
-
-
         if (mBluetoothDeviceAddress != null && !mBluetoothDeviceAddress.equals("")) {
-            CocktailModel.SignalType signalType = viewModel.getCocktailSignalType().getValue();
-            String signal = viewModel.getCocktailSignal().getValue();
+            CocktailModel.SignalType signalType = mViewModel.getCocktailSignalType().getValue();
+            String signal = mViewModel.getCocktailSignal().getValue();
 
             if (signalType != null && signal != null && !signal.equals("")) {
                 switch (signalType) {

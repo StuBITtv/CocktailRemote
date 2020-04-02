@@ -10,12 +10,17 @@
         tools:context=".BluetoothDevicePickerActivity">
 
     <androidx.recyclerview.widget.RecyclerView
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="16dp" android:layout_marginStart="16dp"
-            app:layout_constraintEnd_toEndOf="parent" android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp" app:layout_constraintBottom_toBottomOf="parent"
-            tools:listitem="@layout/item_bluetooth_device" android:id="@+id/bluetooth_device_list"/>
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            android:id="@+id/bluetooth_device_list"
+            tools:listitem="@layout/item_bluetooth_device"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>

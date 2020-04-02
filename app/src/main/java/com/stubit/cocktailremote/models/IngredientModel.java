@@ -49,7 +49,7 @@ public class IngredientModel {
 
     @Dao
     public interface Access {
-        @Query("SELECT * FROM Ingredientmodel WHERE cocktail_id=:cocktailId")
+        @Query("SELECT * FROM IngredientModel WHERE cocktail_id=:cocktailId")
         LiveData<List<IngredientModel>> getAllFromCocktail(int cocktailId);
 
         @Insert

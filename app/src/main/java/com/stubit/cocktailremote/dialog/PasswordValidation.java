@@ -1,5 +1,6 @@
 package com.stubit.cocktailremote.dialog;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ public class PasswordValidation {
     public static void validatePassword(AppCompatActivity app, Runnable onValidation) {
         AlertDialog.Builder alertBuilder = new AlertDialog.Builder(app, R.style.AppTheme_Dialog);
 
+        @SuppressLint("InflateParams")
         View inputLayout = app.getLayoutInflater().inflate(R.layout.dialog_password_validation, null);
         EditText passwordInput = inputLayout.findViewById(R.id.password_input);
 

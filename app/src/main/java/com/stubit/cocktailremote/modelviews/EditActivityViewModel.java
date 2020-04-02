@@ -63,6 +63,11 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
         mUnsavedChanges.setValue(true);
     }
 
+    public void setPasswordProtection(Boolean state) {
+        mPasswordProtected.setValue(state);
+        mUnsavedChanges.setValue(true);
+    }
+
     public void addIngredient() {
         ArrayList<String> newIngredientNames = mCocktailIngredientNames.getValue();
 
@@ -156,6 +161,7 @@ public class EditActivityViewModel extends CocktailActivityViewModel {
         mCocktail.setDescription(mCocktailDescription.getValue());
         mCocktail.setSignalType(mCocktailSignalType.getValue());
         mCocktail.setSignal(mCocktailSignal.getValue());
+        mCocktail.setPasswordProtected(mPasswordProtected.getValue());
 
         Uri imageUri = mCocktailImageUri.getValue();
 

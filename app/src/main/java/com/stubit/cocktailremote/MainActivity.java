@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
             if(PasswordValidation.passwordIsNotSet(this)) {
                 startActivity(new Intent(this, SettingsActivity.class));
             } else {
+                //noinspection CodeBlock2Expr
                 PasswordValidation.validatePassword(this, () -> {
                     startActivity(new Intent(this, SettingsActivity.class));
                 });

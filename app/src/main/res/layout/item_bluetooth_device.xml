@@ -8,18 +8,33 @@
 >
 
     <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="16dp" android:id="@+id/device_name" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginLeft="16dp" android:layout_marginStart="16dp"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="16dp" android:layout_marginRight="16dp" tools:text="Device Name"
-            android:textSize="16sp" android:textStyle="bold" android:textColor="@android:color/white"/>
-    <TextView
+            app:layout_constraintTop_toTopOf="parent"
             android:layout_width="0dp"
-            android:layout_height="wrap_content" android:id="@+id/device_address"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:id="@+id/device_name"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            tools:text="Device Name"
+    />
+    <TextView
             app:layout_constraintTop_toBottomOf="@+id/device_name"
-            app:layout_constraintStart_toStartOf="@+id/device_name" app:layout_constraintEnd_toEndOf="@+id/device_name"
-            android:layout_marginTop="4dp" app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="16dp" tools:text="Device Adress" android:textColor="@android:color/white"/>
+            app:layout_constraintStart_toStartOf="@+id/device_name"
+            app:layout_constraintEnd_toEndOf="@+id/device_name"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/device_address"
+            android:layout_marginTop="4dp"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/white"
+            tools:text="Device Address"
+    />
 </androidx.constraintlayout.widget.ConstraintLayout>
