@@ -26,8 +26,8 @@
 
     <string name="bluetooth_signal">Bluetooth signal</string>
     <string name="binary">Binary</string>
-    <string name="integer">Integer</string>
-    <string name="string">String</string>
+    <string name="integer" translatable="false">Integer</string>
+    <string name="string" translatable="false">String</string>
     <string name="no_bluetooth_signal">No bluetooth signal added yet.</string>
 
     <string name="password_change_hint">You can change the password in the app settings.</string>

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Cocktail Fernbedienung</string>
+    <string name="add_ingredient">Zutat hinzufügen</string>
+    <string name="binary">Binär</string>
+    <string name="bluetooth_connection_failure">Bluetooth-Verbindung fehlgeschlagen</string>
+    <string name="bluetooth_signal">Bluetooth-Signal</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="cocktail_description">Cocktail Beschreibung</string>
+    <string name="cocktail_image">Bild des Cocktails</string>
+    <string name="cocktail_name">Cocktail name</string>
+    <string name="delete">Löschen</string>
+    <string name="edit">Bearbeiten</string>
+    <string name="image_not_found">Bild nicht gefunden.</string>
+    <string name="ingredients">Zutaten</string>
+    <string name="invalid_password">Ungültiges Password</string>
+    <string name="lock_edit">Bearbeiten sperren</string>
+    <string name="no_bluetooth_signal">Kein Bluetooth-Signal hinzugefügt.</string>
+    <string name="no_description">Keine Beschreibung hinzugefügt.</string>
+    <string name="no_ingredients">Keine Zutaten hinzugefügt.</string>
+    <string name="password">Passwort</string>
+    <string name="ok">OK</string>
+    <string name="password_change_hint">Du kannst das Passwort in den App-Einstellungen ändern.</string>
+    <string name="password_protection">Passwortschutz</string>
+    <string name="password_summary">Überall in der App verwendet. Klicken, um es zu ändern. Leer lassen zum entfernen.
+    </string>
+    <string name="password_validation">Passwort benötigt</string>
+    <string name="permission_needed">Berechtigung zur Bildauswahl benötigt.</string>
+    <string name="settings">Einstellungen</string>
+    <string name="title_activity_bluetooth_device_picker">Bluetooth-Gerät Wähler</string>
+    <string name="title_activity_cocktail">Cocktail Details</string>
+    <string name="title_activity_edit">Cocktail bearbeiten</string>
+    <string name="title_activity_settings">Einstellungen</string>
+    <string name="unnamed_cocktail">Unbenannter Cocktail</string>
+    <string name="unnamed_ingredient">Unbenannte Zutat</string>
+</resources>
