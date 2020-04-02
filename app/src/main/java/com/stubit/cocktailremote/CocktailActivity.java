@@ -259,7 +259,6 @@ public class CocktailActivity extends AppCompatActivity {
                 createToast(R.string.no_bluetooth_signal);
             }
         } else {
-            // TODO setup intent
             startActivityForResult(new Intent(this, BluetoothDevicePickerActivity.class), BLUETOOTH_DEVICE_REQUEST);
         }
     }
