@@ -34,7 +34,6 @@ public class CocktailActivity extends AppCompatActivity {
     private CocktailActivityViewModel mViewModel;
 
     private Toast mToast;
-    private String mBluetoothDeviceAddress;
 
     private Boolean mPasswordProtectedCocktail;
     private Dialog mDialog;
@@ -96,7 +95,6 @@ public class CocktailActivity extends AppCompatActivity {
         // endregion
 
         // region setup bluetooth action
-        mBluetoothDeviceAddress = BluetoothManager.getInstance().getConnectedDeviceAddress();
 
         mViewModel.getPasswordProtectionStatus().observe(this, passwordProtected -> {
             FloatingActionButton fab = findViewById(R.id.fab);
@@ -104,9 +102,17 @@ public class CocktailActivity extends AppCompatActivity {
 
             fab.setOnClickListener(view -> {
                 if (PasswordValidation.passwordIsNotSet(this) || !passwordProtected) {
-                    new Thread(this::sendBluetoothSignal).start();
+                    //noinspection CodeBlock2Expr
+                    new Thread(() -> {
+                        sendBluetoothSignal(BluetoothManager.getInstance().getConnectedDeviceAddress().getValue());
+                    }).start();
                 } else {
-                    pushDialog(PasswordValidation.validatePassword(this, () -> new Thread(this::sendBluetoothSignal).start()));
+                    pushDialog(PasswordValidation.validatePassword(this, () -> {
+                        //noinspection CodeBlock2Expr
+                        new Thread(() -> {
+                            sendBluetoothSignal(BluetoothManager.getInstance().getConnectedDeviceAddress().getValue());
+                        }).start();
+                    }));
                 }
             });
         });
@@ -195,8 +201,8 @@ public class CocktailActivity extends AppCompatActivity {
 
     }
 
-    private void sendBluetoothSignal() {
-        if (mBluetoothDeviceAddress != null && !mBluetoothDeviceAddress.equals("")) {
+    private void sendBluetoothSignal(String bluetoothDeviceAddress) {
+        if (bluetoothDeviceAddress != null && !bluetoothDeviceAddress.equals("")) {
             CocktailModel.SignalType signalType = mViewModel.getCocktailSignalType().getValue();
             String signal = mViewModel.getCocktailSignal().getValue();
 
@@ -235,7 +241,7 @@ public class CocktailActivity extends AppCompatActivity {
 
                         BluetoothManager.getInstance().send(
                                 this,
-                                mBluetoothDeviceAddress,
+                                bluetoothDeviceAddress,
                                 bytes,
                                 this::unableToConnect
                         );
@@ -244,7 +250,7 @@ public class CocktailActivity extends AppCompatActivity {
                     case INTEGER:
                         BluetoothManager.getInstance().send(
                                 this,
-                                mBluetoothDeviceAddress,
+                                bluetoothDeviceAddress,
                                 Integer.valueOf(signal),
                                 this::unableToConnect
                         );
@@ -253,7 +259,7 @@ public class CocktailActivity extends AppCompatActivity {
                     default:
                         BluetoothManager.getInstance().send(
                                 this,
-                                mBluetoothDeviceAddress,
+                                bluetoothDeviceAddress,
                                 signal,
                                 this::unableToConnect
                         );
@@ -272,15 +278,12 @@ public class CocktailActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == BLUETOOTH_DEVICE_REQUEST && data != null && resultCode == RESULT_OK) {
-            mBluetoothDeviceAddress = data.getStringExtra(BLUETOOTH_DEVICE);
-            new Thread(this::sendBluetoothSignal).start();
+            new Thread(() -> sendBluetoothSignal(data.getStringExtra(BLUETOOTH_DEVICE))).start();
         }
 
     }
 
     public void unableToConnect() {
-        mBluetoothDeviceAddress = null;
-
         createToast(R.string.bluetooth_connection_failure);
         startActivityForResult(new Intent(this, BluetoothDevicePickerActivity.class), BLUETOOTH_DEVICE_REQUEST);
     }

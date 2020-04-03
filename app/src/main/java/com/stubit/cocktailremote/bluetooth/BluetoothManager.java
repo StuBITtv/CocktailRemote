@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +27,8 @@ public class BluetoothManager {
     private BroadcastReceiver mBluetoothEnabledReceiver;
     private BluetoothSocket mBluetoothSocket;
 
-    private String mUsedBluetoothAddress;
+    private MutableLiveData<String> mUsedBluetoothAddress = new MutableLiveData<>();
+    private BroadcastReceiver mBluetoothDisconnectReceiver;
 
     public BluetoothManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -44,7 +46,62 @@ public class BluetoothManager {
         return mInstance;
     }
 
-    public String getConnectedDeviceAddress() {
+    public void registerBluetoothDisconnectWatcher(@NotNull AppCompatActivity app, Runnable onDisconnect) {
+        if(mBluetoothDisconnectReceiver != null) {
+            throw new IllegalStateException("Only one bluetooth disconnect watcher can be registered simultaneity");
+        }
+
+        IntentFilter disconnectFilter = new IntentFilter();
+        disconnectFilter.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+        disconnectFilter.addAction(ACTION_STATE_CHANGED);
+
+        mBluetoothDisconnectReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                int bluetoothAdapterState = intent.getIntExtra(EXTRA_STATE, 0);
+
+                if(
+                        device != null
+                        && mUsedBluetoothAddress.getValue() != null &&
+                        device.getAddress().equals(mUsedBluetoothAddress.getValue())
+                ) {
+                    onDisconnect(onDisconnect);
+                } else if (bluetoothAdapterState == STATE_OFF && mUsedBluetoothAddress.getValue() != null) {
+                    onDisconnect(onDisconnect);
+                }
+
+            }
+        };
+
+        app.registerReceiver(mBluetoothDisconnectReceiver, disconnectFilter);
+        Log.d(TAG, "Bluetooth disconnect watcher registered");
+    }
+
+    private void onDisconnect(Runnable onDisconnect) {
+        try {
+            disconnect();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        mUsedBluetoothAddress.postValue(null);
+
+        if(onDisconnect != null) {
+            onDisconnect.run();
+        }
+    }
+
+    public void unregisterBluetoothDisconnectWatcher(@NotNull AppCompatActivity app) {
+        if(mBluetoothDisconnectReceiver != null) {
+            app.unregisterReceiver(mBluetoothDisconnectReceiver);
+            mBluetoothDisconnectReceiver = null;
+
+            Log.d(TAG, "Bluetooth disconnect watcher unregistered");
+        }
+    }
+
+    public LiveData<String> getConnectedDeviceAddress() {
         return mUsedBluetoothAddress;
     }
 
@@ -177,14 +234,14 @@ public class BluetoothManager {
             mBluetoothSocket.close();
 
             mBluetoothSocket = null;
-            mUsedBluetoothAddress = null;
+            mUsedBluetoothAddress.postValue(null);
 
             Log.d(TAG, "Disconnected bluetooth device");
         }
     }
 
     private void connect(@NotNull String deviceAddress) throws IOException {
-        if (mUsedBluetoothAddress == null || !mUsedBluetoothAddress.equals(deviceAddress)) {
+        if (mUsedBluetoothAddress.getValue() == null || !mUsedBluetoothAddress.getValue().equals(deviceAddress)) {
             disconnect();
 
             BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(deviceAddress);
@@ -193,7 +250,7 @@ public class BluetoothManager {
             mBluetoothSocket = device.createInsecureRfcommSocketToServiceRecord(device.getUuids()[0].getUuid());
             mBluetoothSocket.connect();
 
-            mUsedBluetoothAddress = deviceAddress;
+            mUsedBluetoothAddress.postValue(deviceAddress);
             Log.d(TAG, "Connected bluetooth device");
         }
     }

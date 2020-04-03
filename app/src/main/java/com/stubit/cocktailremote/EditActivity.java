@@ -421,7 +421,7 @@ public class EditActivity extends AppCompatActivity {
         mViewModel.cleanUp();
 
         if (mViewModel.getCocktailId() == null) {
-            startActivity(new Intent(this, MainActivity.class));
+            super.onBackPressed();
         } else {
             if (mSubmittedId != 0) {
                 Intent showIntent = new Intent(this, CocktailActivity.class);

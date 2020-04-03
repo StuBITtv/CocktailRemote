@@ -3,8 +3,12 @@ package com.stubit.cocktailremote;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.ProcessLifecycleOwner;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -20,6 +24,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "MainActivity";
     private Dialog mDialog;
 
     @Override
@@ -51,6 +56,13 @@ public class MainActivity extends AppCompatActivity {
                 new CocktailAdapter(this, viewModel)
         );
         cocktailList.setLayoutManager(new LinearLayoutManager(this));
+
+        BluetoothManager.getInstance().registerBluetoothDisconnectWatcher(this, () -> {
+            if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
+                Log.d(TAG, "App in foreground, notify about disconnect");
+                Toast.makeText(this, R.string.bluetooth_disconnected, Toast.LENGTH_SHORT).show();
+            };
+        });
     }
 
     @Override
@@ -58,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
 
         pushDialog(null);
+        BluetoothManager.getInstance().unregisterBluetoothDisconnectWatcher(this);
         BluetoothManager.getInstance().cleanup(this);
     }
 

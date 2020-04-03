@@ -46,4 +46,5 @@
     <string name="cancel">Cancel</string>
     <string name="ok">OK</string>
     <string name="invalid_password">Invalid password</string>
+    <string name="bluetooth_disconnected">Bluetooth disconnected</string>
 </resources>
