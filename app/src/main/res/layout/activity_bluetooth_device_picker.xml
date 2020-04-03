@@ -23,6 +23,6 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_bluetooth_device_picker" android:background="@color/colorPrimaryLight"/>
+    <include layout="@layout/content_bluetooth_device_picker"/>
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
