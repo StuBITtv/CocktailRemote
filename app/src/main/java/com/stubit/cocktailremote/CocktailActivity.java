@@ -100,7 +100,7 @@ public class CocktailActivity extends AppCompatActivity {
 
         mViewModel.getPasswordProtectionStatus().observe(this, passwordProtected -> {
             FloatingActionButton fab = findViewById(R.id.fab);
-            mPasswordProtectedCocktail = passwordProtected;
+            setPasswordProtection(passwordProtected);
 
             fab.setOnClickListener(view -> {
                 if (PasswordValidation.passwordIsNotSet(this) || !passwordProtected) {
@@ -135,12 +135,12 @@ public class CocktailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getTitle() != null && item.getTitle().equals(getString(R.string.edit))) {
-            if(mPasswordProtectedCocktail == null) {
+            if (mPasswordProtectedCocktail == null) {
                 mViewModel.getPasswordProtectionStatus().observe(this, new Observer<Boolean>() {
                     @Override
                     public void onChanged(Boolean passwordProtected) {
                         mViewModel.getPasswordProtectionStatus().removeObserver(this);
-                        mPasswordProtectedCocktail = passwordProtected;
+                        setPasswordProtection(passwordProtected);
 
                         authoriseEdit();
                     }
@@ -154,11 +154,15 @@ public class CocktailActivity extends AppCompatActivity {
     }
 
     private void pushDialog(Dialog dialog) {
-        if(mDialog != null) {
+        if (mDialog != null) {
             mDialog.dismiss();
         }
 
         mDialog = dialog;
+    }
+
+    private void setPasswordProtection(Boolean savedState) {
+        mPasswordProtectedCocktail = savedState != null ? savedState : false;
     }
 
     private void authoriseEdit() {
