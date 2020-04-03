@@ -31,9 +31,9 @@ public class BluetoothManager {
     public BluetoothManager() {
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-      /*  if (mBluetoothAdapter == null) {
+        if (mBluetoothAdapter == null) {
             throw new RuntimeException("No bluetooth adapter available");
-        }*/
+        }
     }
 
     public static BluetoothManager getInstance() {
