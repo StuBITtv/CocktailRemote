@@ -8,7 +8,7 @@ A Bluetooth remote for homemade cocktail machines.
 
 ## Screenshots
 ![Cocktail list](https://i.imgur.com/nAVUVh7.jpg)
-![Cocktail view](https://i.imgur.com/feIuu32.png)
+![Cocktail view](https://i.imgur.com/p47JkDe.png)
 ![Cocktail edit view top](https://i.imgur.com/Sj304ye.png)
 ![Cocktail edit view bottom](https://i.imgur.com/YsDpSXd.png)
 
