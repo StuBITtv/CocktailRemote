@@ -95,7 +95,6 @@ public class CocktailActivity extends AppCompatActivity {
         // endregion
 
         // region setup bluetooth action
-
         mViewModel.getPasswordProtectionStatus().observe(this, passwordProtected -> {
             FloatingActionButton fab = findViewById(R.id.fab);
             setPasswordProtection(passwordProtected);
@@ -107,16 +106,13 @@ public class CocktailActivity extends AppCompatActivity {
                         sendBluetoothSignal(BluetoothManager.getInstance().getConnectedDeviceAddress().getValue());
                     }).start();
                 } else {
-                    pushDialog(PasswordValidation.validatePassword(this, () -> {
-                        //noinspection CodeBlock2Expr
-                        new Thread(() -> {
-                            sendBluetoothSignal(BluetoothManager.getInstance().getConnectedDeviceAddress().getValue());
-                        }).start();
-                    }));
+                    //noinspection CodeBlock2Expr
+                    pushDialog(PasswordValidation.validatePassword(this, () -> new Thread(() -> {
+                        sendBluetoothSignal(BluetoothManager.getInstance().getConnectedDeviceAddress().getValue());
+                    }).start()));
                 }
             });
         });
-
         // endregion
 
         //noinspection ConstantConditions

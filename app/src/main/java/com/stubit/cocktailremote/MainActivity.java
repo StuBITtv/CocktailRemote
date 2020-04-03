@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
             if(ProcessLifecycleOwner.get().getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) {
                 Log.d(TAG, "App in foreground, notify about disconnect");
                 Toast.makeText(this, R.string.bluetooth_disconnected, Toast.LENGTH_SHORT).show();
-            };
+            }
         });
     }
 
