@@ -12,7 +12,7 @@
             android:layout_height="match_parent"
             tools:showIn="@layout/activity_edit"
             tools:context=".EditActivity"
-            android:background="@color/colorPrimaryLight">
+    >
         <com.stubit.cocktailremote.views.CocktailImageView
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
