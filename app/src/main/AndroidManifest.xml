@@ -62,9 +62,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-                android:name=".bluetooth.BluetoothManager"
-                android:value="com.stubit.cocktailremote.BluetoothManager"/>
     </application>
 
 </manifest>
