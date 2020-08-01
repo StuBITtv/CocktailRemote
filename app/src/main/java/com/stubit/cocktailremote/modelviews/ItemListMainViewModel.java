@@ -15,6 +15,7 @@ public class ItemListMainViewModel extends ViewModel {
 
     private final MutableLiveData<ArrayList<Integer>> mCocktailIds = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<String>> mCocktailNames = new MutableLiveData<>();
+    private final MutableLiveData<ArrayList<String>> mCocktailDescriptions = new MutableLiveData<>();
     private final MutableLiveData<ArrayList<Uri>> mCocktailImages = new MutableLiveData<>();
 
     private final CocktailRepository mCocktailRepository;
@@ -33,6 +34,10 @@ public class ItemListMainViewModel extends ViewModel {
         return mCocktailNames;
     }
 
+    public LiveData<ArrayList<String>> getCocktailDescriptions() {
+        return mCocktailDescriptions;
+    }
+
     public LiveData<ArrayList<Uri>> getCocktailImageUris() {
         return mCocktailImages;
     }
@@ -42,6 +47,7 @@ public class ItemListMainViewModel extends ViewModel {
 
         ArrayList<Integer> cocktailIds = new ArrayList<>();
         ArrayList<String> cocktailNames = new ArrayList<>();
+        ArrayList<String> cocktailDescriptions = new ArrayList<>();
         ArrayList<Uri> cocktailImages = new ArrayList<>();
 
         for (int i = 0; cocktails != null && i < cocktails.size(); ++i) {
@@ -49,6 +55,7 @@ public class ItemListMainViewModel extends ViewModel {
 
             cocktailIds.add(cocktail.getId());
             cocktailNames.add(cocktail.getName());
+            cocktailDescriptions.add(cocktail.getDescription());
 
             if(cocktail.getImageUri() != null) {
                 cocktailImages.add(Uri.parse(cocktail.getImageUri()));
@@ -59,6 +66,7 @@ public class ItemListMainViewModel extends ViewModel {
 
         mCocktailIds.setValue(cocktailIds);
         mCocktailNames.setValue(cocktailNames);
+        mCocktailDescriptions.setValue(cocktailDescriptions);
         mCocktailImages.setValue(cocktailImages);
 
         Log.d(TAG, "Cocktail lists updated");

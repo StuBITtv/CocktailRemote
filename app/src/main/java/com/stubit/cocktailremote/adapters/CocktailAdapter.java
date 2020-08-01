@@ -23,6 +23,7 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     private final static String TAG = "CocktailAdapter";
 
     private ArrayList<String> mCocktailNames;
+    private ArrayList<String> mCocktailDescriptions;
     private ArrayList<Uri> mCocktailImageUris;
 
     public CocktailAdapter(LifecycleOwner owner, final ItemListMainViewModel viewModel) {
@@ -32,6 +33,13 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
             Log.d(TAG, "dataset changed");
 
             mCocktailNames = cocktailNames;
+            notifyDataSetChanged();
+        });
+
+        mViewModel.getCocktailDescriptions().observe(owner, cocktailDescription -> {
+            Log.d(TAG, "dataset changed");
+
+            mCocktailDescriptions = cocktailDescription;
             notifyDataSetChanged();
         });
 
@@ -55,6 +63,11 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
         if (mCocktailNames != null) {
             String cocktailName = mCocktailNames.get(position);
             holder.mNameView.setText(cocktailName, R.string.unnamed_cocktail);
+        }
+
+        if (mCocktailDescriptions != null) {
+            String cocktailDescription = mCocktailDescriptions.get(position);
+            holder.mDescriptionView.setText(cocktailDescription, R.string.no_description);
         }
 
         if(mCocktailImageUris != null) {
@@ -98,6 +111,7 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
     protected static class ViewHolder extends RecyclerView.ViewHolder {
         final View mHolder;
         final TextView mNameView;
+        final TextView mDescriptionView;
         final ImageView mImageView;
 
         public ViewHolder(@NonNull View itemView) {
@@ -105,6 +119,7 @@ public class CocktailAdapter extends RecyclerView.Adapter<CocktailAdapter.ViewHo
 
             mHolder = itemView;
             mNameView = itemView.findViewById(R.id.cocktail_name);
+            mDescriptionView = itemView.findViewById(R.id.description_text);
             mImageView = itemView.findViewById(R.id.cocktail_image);
         }
     }
