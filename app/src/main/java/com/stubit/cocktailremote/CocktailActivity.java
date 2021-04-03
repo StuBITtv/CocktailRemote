@@ -100,7 +100,7 @@ public class CocktailActivity extends AppCompatActivity {
             setPasswordProtection(passwordProtected);
 
             fab.setOnClickListener(view -> {
-                if (PasswordValidation.passwordIsNotSet(this) || !passwordProtected) {
+                if (PasswordValidation.passwordIsNotSet(this) || !mPasswordProtectedCocktail) {
                     //noinspection CodeBlock2Expr
                     new Thread(() -> {
                         sendBluetoothSignal(BluetoothManager.getInstance().getConnectedDeviceAddress().getValue());
